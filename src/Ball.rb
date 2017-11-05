@@ -17,6 +17,9 @@ class Ball
 		@delay = args[:delay].nil? ? 0 : args[:delay]
 		@@timeout = 3
 		@reset_time = (@delay == 0) ? (Time.now + @@timeout) : (Time.now + @delay)
+		@@samples = {
+			pad_hit: Gosu::Sample.new("./samples/pad_hit.ogg")
+		}
 	end
 
 	def reset dir=:right
@@ -103,6 +106,8 @@ class Ball
 			case coll[:target]
 			# Player collision
 			when :player
+				# Play sample
+				@@samples[:pad_hit].play 0.5, 2
 				case coll[:id]
 				when 0
 					@speed[:x] = @speed[:x].abs
