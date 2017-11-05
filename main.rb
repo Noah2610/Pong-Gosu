@@ -4,10 +4,11 @@ require './src/Screen'
 require './src/PlayingArea'
 require './src/Pad'
 require './src/Ball'
+require './src/Panel'
 
 $screen_res = {
-	w: 640,
-	h: 480
+	w: 800,
+	h: 520
 }
 
 $controls = [
@@ -36,8 +37,8 @@ class Game < Gosu::Window
 	end
 
 	def update
-		# Ball update / move
-		@screen.playing_area.ball.update
+		# Update Ball(s)
+		@screen.playing_area.balls.each &:update
 
 		# Player / Pad controls
 		@screen.playing_area.players.each do |p|

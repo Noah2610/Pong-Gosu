@@ -29,9 +29,9 @@ class Pad
 	def move id
 		case id
 		when :up
-			@y -= @@step
+			@y -= @@step  unless (@y - (@size[:h] / 2) <= 0)
 		when :down
-			@y += @@step
+			@y += @@step  unless (@y + (@size[:h] / 2) >= @playing_area.h)
 		end
 	end
 

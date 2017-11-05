@@ -14,9 +14,13 @@ class Ball
 			y: 0
 		}
 		@speed = @@start_speed.dup
+		@delay = args[:delay].nil? ? 0 : args[:delay]
+		@@timeout = 3
+		@reset_time = (@delay == 0) ? (Time.now + @@timeout) : (Time.now + @delay)
 	end
 
 	def reset dir=:right
+		@reset_time = Time.now + @@timeout
 		@x = @playing_area.w / 2
 		@y = @playing_area.h / 2
 		@speed = @@start_speed.dup
@@ -85,6 +89,8 @@ class Ball
 	end
 
 	def move
+		# Start moving after reset
+		return  if (Time.now < @reset_time)
 		@x += @speed[:x]
 		@y += @speed[:y]
 	end
@@ -139,7 +145,19 @@ class Ball
 	end
 
 	def draw
+		# Draw Ball
 		Gosu.draw_rect (@x - (@size / 2)), (@y - (@size / 2)), @size, @size, @color
+		# Draw countdown after reset
+		if (Time.now <= @reset_time)
+			# Draw countdown
+			remaining = ((@reset_time - Time.now).to_i + 1).to_s
+			font = Gosu::Font.new 64
+			font.draw_rel remaining, (@playing_area.w / 2),(@playing_area.h / 2 - 64), 1, 0.5, 0.5, 1,1, Gosu::Color.argb(0xff_ffff00)
+			# Draw direction indicator
+			font.draw_rel (@speed[:x] > 0 ? ">" : (@speed[:x] < 0 ? "<" : "-")), (@playing_area.w / 2),(@playing_area.h / 2 - 128), 1, 0.5, 0.5, 1,1, Gosu::Color.argb(0xff_ff0000)
+		elsif (Time.now <= @reset_time + 1)
+			Gosu::Font.new(64).draw_rel "Go!", (@playing_area.w / 2),(@playing_area.h / 2 - 64), 1, 0.5, 0.5, 1,1, Gosu::Color.argb(0xff_ffff00)
+		end
 	end
 end
 
