@@ -5,6 +5,7 @@ require './src/PlayingArea'
 require './src/Pad'
 require './src/Ball'
 require './src/Panel'
+require './src/CpuPad'
 
 $screen_res = {
 	w: 800,
@@ -39,6 +40,8 @@ class Game < Gosu::Window
 	def update
 		# Update Ball(s)
 		@screen.playing_area.balls.each &:update
+		# AI for CpuPad(s)
+		@screen.playing_area.cpu_players.each &:update
 
 		# Player / Pad controls
 		@screen.playing_area.players.each do |p|

@@ -1,5 +1,7 @@
 
 class Ball
+	attr_reader :x, :y
+
 	def initialize args
 		@playing_area = args[:playing_area]
 		@x = @playing_area.w / 2
@@ -8,10 +10,10 @@ class Ball
 		@y = args[:y]  if (!args[:y].nil?)
 		@size = 16
 		@color = Gosu::Color.argb 0xff_000000
-		@@speed_incr = 1
+		@@speed_incr = 0
 		@@start_speed = {
-			x: 4,
-			y: 0
+			x: 6,
+			y: 2
 		}
 		@speed = @@start_speed.dup
 		@delay = args[:delay].nil? ? 0 : args[:delay]
@@ -37,7 +39,7 @@ class Ball
 
 	def collision
 		# Collision checking - Players / Pads
-		@playing_area.players.each do |p|
+		Array.new.concat(@playing_area.players,@playing_area.cpu_players).each do |p|
 			if    (((@x + @size / 2) >= (p.x - p.size[:w] / 2) && (@x - @size / 2) < (p.x + p.size[:w] / 2)) &&
 				    ((@y + @size / 2) >= (p.y - p.size[:h] / 2) && (@y - @size / 2) < (p.y - p.size[:h] / 4)))
 				return {
@@ -131,10 +133,31 @@ class Ball
 				case coll[:side]
 				when :left
 					reset :right
-					@playing_area.players[1].score += 1
+					found = false
+					@playing_area.players.each do |p|
+						if (p.id == 1)
+							p.score += 1
+							found = true
+						end
+					end
+					@playing_area.cpu_players.each do |p|
+						if (p.id == 1)
+							p.score += 1
+						end
+					end  unless found
 				when :right
 					reset :left
-					@playing_area.players[0].score += 1
+					@playing_area.players.each do |p|
+						if (p.id == 0)
+							p.score += 1
+							found = true
+						end
+					end
+					@playing_area.cpu_players.each do |p|
+						if (p.id == 0)
+							p.score += 1
+						end
+					end  unless found
 				end
 
 			when :border
@@ -153,6 +176,7 @@ class Ball
 		# Draw Ball
 		Gosu.draw_rect (@x - (@size / 2)), (@y - (@size / 2)), @size, @size, @color
 		# Draw countdown after reset
+=begin
 		if (Time.now <= @reset_time)
 			# Draw countdown
 			remaining = ((@reset_time - Time.now).to_i + 1).to_s
@@ -163,6 +187,7 @@ class Ball
 		elsif (Time.now <= @reset_time + 1)
 			Gosu::Font.new(64).draw_rel "Go!", (@playing_area.w / 2),(@playing_area.h / 2 - 64), 1, 0.5, 0.5, 1,1, Gosu::Color.argb(0xff_ffff00)
 		end
+=end
 	end
 end
 
