@@ -1,6 +1,6 @@
 
 class Ball
-	attr_reader :x, :y
+	attr_reader :x, :y, :speed, :start_speed
 
 	def initialize args
 		@playing_area = args[:playing_area]
@@ -10,9 +10,9 @@ class Ball
 		@y = args[:y]  if (!args[:y].nil?)
 		@size = 16
 		@color = Gosu::Color.argb 0xff_000000
-		@@speed_incr = 0
+		@@speed_incr = 0.5
 		@@start_speed = {
-			x: 6,
+			x: BALL_START_SPEED_X,
 			y: 2
 		}
 		@speed = @@start_speed.dup
@@ -176,7 +176,6 @@ class Ball
 		# Draw Ball
 		Gosu.draw_rect (@x - (@size / 2)), (@y - (@size / 2)), @size, @size, @color
 		# Draw countdown after reset
-=begin
 		if (Time.now <= @reset_time)
 			# Draw countdown
 			remaining = ((@reset_time - Time.now).to_i + 1).to_s
@@ -187,7 +186,6 @@ class Ball
 		elsif (Time.now <= @reset_time + 1)
 			Gosu::Font.new(64).draw_rel "Go!", (@playing_area.w / 2),(@playing_area.h / 2 - 64), 1, 0.5, 0.5, 1,1, Gosu::Color.argb(0xff_ffff00)
 		end
-=end
 	end
 end
 

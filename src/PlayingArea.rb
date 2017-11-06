@@ -6,11 +6,11 @@ class PlayingArea
 		@w = args[:w]
 		@h = args[:h]
 		@players = [
-			#Pad.new(id: 0, playing_area: self)
+			Pad.new(id: 0, playing_area: self)
 			#Pad.new(id: 1, playing_area: self)
 		]
 		@cpu_players = [
-			CpuPad.new(id: 0, playing_area: self),
+			#CpuPad.new(id: 0, playing_area: self),
 			CpuPad.new(id: 1, playing_area: self)
 		]
 		@balls = [

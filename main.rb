@@ -7,6 +7,8 @@ require './src/Ball'
 require './src/Panel'
 require './src/CpuPad'
 
+# TODO: replace global vars with constants
+
 $screen_res = {
 	w: 800,
 	h: 520
@@ -22,6 +24,8 @@ $controls = [
 		down:  [Gosu::KB_DOWN, Gosu::KB_J]
 	}
 ]
+
+BALL_START_SPEED_X = 4
 
 class Game < Gosu::Window
 	def initialize
