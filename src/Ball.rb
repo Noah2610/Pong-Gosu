@@ -13,16 +13,26 @@ class Ball
 		@@speed_incr = BALL_SPEED_INCR
 		@@start_speed = BALL_START_SPEED
 		@speed = @@start_speed.dup
-		@delay = args[:delay].nil? ? 0 : args[:delay]
 		@@timeout = 3
-		@reset_time = (@delay == 0) ? (Time.now + @@timeout) : (Time.now + @delay)
+		@delay = args[:delay].nil? ? @@timeout : args[:delay]
+		@reset_time = (@delay == @@timeout) ? (Time.now + @@timeout) : (Time.now + @delay)
 		@@samples = {
 			pad_hit: Gosu::Sample.new("./samples/pad_hit.ogg")
 		}
 		@dir = BALL_START_DIR.dup
+		if (!args[:side].nil?)
+			case args[:side]
+			when :left
+				@dir[:x] = @dir[:x].abs * -1
+			when :right
+				@dir[:x] = @dir[:x].abs
+			end
+		end
 		@last_pad_hit = -1
+		@destroy = false
 	end
 
+=begin
 	def reset dir = :right
 		@reset_time = Time.now + @@timeout
 		@x = @playing_area.w / 2
@@ -38,6 +48,7 @@ class Ball
 			@dir[:y] = BALL_START_DIR[:y] * (rand(2) == 0 ? 1 : -1)
 		end
 	end
+=end
 
 	def collision target = :all
 		# Collision checking - Players / Pads
@@ -157,22 +168,8 @@ class Ball
 				end
 
 			when :goal
-				case coll[:side]
-				when :left
-					reset :right
-					@playing_area.pads.each do |p|
-						if (p.id == 1)
-							p.score += 1
-						end
-					end
-				when :right
-					reset :left
-					@playing_area.pads.each do |p|
-						if (p.id == 0)
-							p.score += 1
-						end
-					end
-				end
+				@playing_area.goal coll[:side]
+				@destroy = true
 
 			when :border
 				case coll[:side]
@@ -191,12 +188,12 @@ class Ball
 		@speed[:x].floor.times do |n|
 			@x +=  @dir[:x]
 			handle_collision
-			return  if (Time.now < @reset_time)
+			return  if (Time.now < @reset_time || @destroy)
 		end
 		@speed[:y].floor.times do |n|
 			@y += @dir[:y]
 			handle_collision
-			return  if (Time.now < @reset_time)
+			return  if (Time.now < @reset_time || @destroy)
 		end
 	end
 
