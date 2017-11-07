@@ -27,7 +27,7 @@ CONTROLS = [
 
 BALL_START_SPEED = {
 	x: 4,
-	y: 1
+	y: 0
 }
 
 BALL_START_DIR = {

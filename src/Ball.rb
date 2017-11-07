@@ -39,24 +39,32 @@ class Ball
 		end
 	end
 
-	def collision
+	def collision target = :all
 		# Collision checking - Players / Pads
 		Array.new.concat(@playing_area.players,@playing_area.cpu_players).each do |p|
-			if    (((@x + @size / 2) >= (p.x - p.size[:w] / 2) && (@x - @size / 2) <= (p.x + p.size[:w] / 2)) &&
+			x_offset = 0
+			case p.id
+			when 0
+				x_offset = -(@size / 2)
+			when 1
+				x_offset = @size / 2
+			end
+
+			if    (((@x + x_offset) >= (p.x - p.size[:w] / 2) && (@x + x_offset) <= (p.x + p.size[:w] / 2)) &&
 				     ((@y + @size / 2) >= (p.y - p.size[:h] / 2) && (@y + @size / 2) <= (p.y - p.size[:h] / 4)))
 				return {
 					target: :player,
 					pos: :top,
 					id: p.id
 				}
-			elsif (((@x + @size / 2) >= (p.x - p.size[:w] / 2) && (@x - @size / 2) <= (p.x + p.size[:w] / 2)) &&
+			elsif (((@x + x_offset) >= (p.x - p.size[:w] / 2) && (@x + x_offset) <= (p.x + p.size[:w] / 2)) &&
 						 ((@y - @size / 2) >= (p.y + p.size[:h] / 4) && (@y - @size / 2) <= (p.y + p.size[:h] / 2)))
 				return {
 					target: :player,
 					pos: :bottom,
 					id: p.id
 				}
-			elsif (((@x) >= (p.x - p.size[:w] / 2) && (@x - @size / 2) <= (p.x + p.size[:w] / 2)) &&
+			elsif (((@x + x_offset) >= (p.x - p.size[:w] / 2) && (@x + x_offset) <= (p.x + p.size[:w] / 2)) &&
 						 ((@y) >= (p.y - p.size[:h] / 4) && (@y - @size / 2) <= (p.y + p.size[:h] / 4)))
 				return {
 					target: :player,
@@ -64,7 +72,7 @@ class Ball
 					id: p.id
 				}
 			end
-		end
+		end  if (target == :all || target == :player)
 
 		# Collision checking - Goals (x)
 		if    ((@x + @size / 2) > @playing_area.w)
@@ -77,7 +85,7 @@ class Ball
 				target: :goal,
 				side: :left
 			}
-		end
+		end  if (target == :all || target == :goal)
 
 		# Collision checking - Borders (y)
 		if    ((@y + @size / 2) > @playing_area.h)
@@ -90,29 +98,16 @@ class Ball
 				target: :border,
 				side: :top
 			}
-		end
+		end  if (target == :all || target == :border)
 
 		return false
 	end
 
-	def move
-		# Start moving after reset
-		return  if (Time.now < @reset_time)
-		puts @speed.to_s
-		@speed[:x].floor.times do |n|
-			@x += 1 * @dir[:x]
-		end
-		@speed[:y].floor.times do |n|
-			@y += 1 * @dir[:y]
-		end
-	end
-
-	def update
-		move
+	def handle_collision
 		coll = collision
 		if (coll)
 			case coll[:target]
-			# Player collision
+				# Player collision
 			when :player
 				case coll[:id]
 				when 0
@@ -202,6 +197,24 @@ class Ball
 
 			end
 		end
+	end
+
+	def move
+		# Start moving after reset
+		return  if (Time.now < @reset_time)
+		@speed[:x].floor.times do |n|
+			handle_collision
+			@x +=  @dir[:x]
+		end
+		@speed[:y].floor.times do |n|
+			handle_collision
+			@y += @dir[:y]
+		end
+	end
+
+	def update
+		move
+		handle_collision
 	end
 
 	def draw

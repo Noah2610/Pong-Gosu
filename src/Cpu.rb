@@ -2,7 +2,7 @@
 class Cpu < Pad
 	def init
 		@color = Gosu::Color.argb 0xff_444444
-		@@move_padding = @size[:h] / 2
+		@@move_padding = @size[:h] / 4
 	end
 
 	def find_ball
@@ -25,20 +25,13 @@ class Cpu < Pad
 				}
 			end
 		end
-		return closest[:ball]
+		return closest[:ball]  unless (closest[:dist].nil? || closest[:dist] > @playing_area.w / 2)
 	end
 
 	def update
 		# Find closest Ball
 		ball = find_ball
 		return  if ball.nil?
-		# TODO: vvv make this better vvv
-		if ((ball.speed[:x] - BALL_START_SPEED[:x]) % 2 == 0)
-			@speed = @@speed + ball.speed[:x] / 2
-		elsif (ball.speed[:x] == BALL_START_SPEED[:x])
-			@speed = @@speed
-		end
-
 		diff = ball.y - @y
 		return  if (diff.abs < @@move_padding)
 		if    (diff < 0)

@@ -33,6 +33,11 @@ class Pad
 	end
 
 	def move id
+		speed_incr = 0
+		@playing_area.balls.each do |ball|
+			speed_incr = ball.speed[:y].floor - 1  if (ball.speed[:y].floor - 1 > speed_incr)
+		end
+		@speed = @@speed + speed_incr
 		dir = 0
 		case id
 		when :up
