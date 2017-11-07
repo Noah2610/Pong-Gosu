@@ -31,6 +31,8 @@ class Pad
 
 	def init
 	end
+	def update
+	end
 
 	def move id
 		speed_incr = 0
@@ -54,7 +56,11 @@ class Pad
 	end
 
 	def draw
+		# Draw Pad
 		Gosu.draw_rect (@x - (@size[:w] / 2)), (@y - (@size[:h] / 2)), @size[:w], @size[:h], @color
+		# Draw debugging lines, Pad part separators (not dynamic, doesn't adjust to actual collision checking method)
+		#Gosu.draw_rect (@x - (@size[:w] / 2)), (@y - (@size[:h] / 4)), @size[:w], 2, Gosu::Color.argb(0xff_ff0000)
+		#Gosu.draw_rect (@x - (@size[:w] / 2)), (@y + (@size[:h] / 4)), @size[:w], 2, Gosu::Color.argb(0xff_ff0000)
 	end
 end
 

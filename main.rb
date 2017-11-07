@@ -1,5 +1,6 @@
 
 require 'gosu'
+require 'byebug'
 require './src/Screen'
 require './src/PlayingArea'
 require './src/Ball'
@@ -10,7 +11,7 @@ require './src/Cpu'
 #require './src/CpuPad'
 
 SCREEN_RES = {
-	w: 800,
+	w: 840,
 	h: 520
 }
 

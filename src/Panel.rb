@@ -5,8 +5,7 @@ class Panel
 		@h = args[:h]
 		@x = args[:x]
 		@y = args[:y]
-		@players = args[:players]
-		@cpu_players = args[:cpu_players]
+		@pads = args[:pads]
 		@balls = args[:balls]
 		@@font = Gosu::Font.new 32
 		@@bgcolor = Gosu::Color.argb 0xff_444444
@@ -19,17 +18,8 @@ class Panel
 	def draw
 		# Draw background
 		Gosu.draw_rect @x,@y, @w,@h, @@bgcolor
-		# Draw Player scores
-		@players.each do |p|
-			case p.id
-			when 0
-				@@font.draw_rel p.score, (@x + 42),(@y + @h / 2), 1, 0.5,0.5, 1,1, @@txtcolor
-			when 1
-				@@font.draw_rel p.score, (@w - 42),(@y + @h / 2), 1, 0.5,0.5, 1,1, @@txtcolor
-			end
-		end
-		# Draw Cpu Player scores
-		@cpu_players.each do |p|
+		# Draw Pad scores
+		@pads.each do |p|
 			case p.id
 			when 0
 				@@font.draw_rel p.score, (@x + 42),(@y + @h / 2), 1, 0.5,0.5, 1,1, @@txtcolor
@@ -48,7 +38,7 @@ class Panel
 				if    (ball.dir[:x] == 1)
 					@@countdown_font.draw_rel ">", (@x + @w / 2), (@y + @h / 2), 1, -2, 0.5, 1,1, @@countdown_color_indicator
 				elsif (ball.dir[:x] == -1)
-					@@countdown_font.draw_rel "<", (@x + @w / 2), (@y + @h / 2), 1, 2, 0.5, 1,1, @@countdown_color_indicator
+					@@countdown_font.draw_rel "<", (@x + @w / 2), (@y + @h / 2), 1, 3, 0.5, 1,1, @@countdown_color_indicator
 				end
 			elsif (Time.now <= ball.reset_time + 1)
 				@@countdown_font.draw_rel "Go!", (@x + @w / 2),(@y + @h / 2), 1, 0.5, 0.5, 1,1, @@countdown_color

@@ -1,6 +1,6 @@
 
 class Ball
-	attr_reader :x, :y, :speed, :reset_time, :dir
+	attr_reader :x, :y, :speed, :reset_time, :dir, :last_pad_hit
 
 	def initialize args
 		@playing_area = args[:playing_area]
@@ -41,7 +41,7 @@ class Ball
 
 	def collision target = :all
 		# Collision checking - Players / Pads
-		Array.new.concat(@playing_area.players,@playing_area.cpu_players).each do |p|
+		@playing_area.pads.each do |p|
 			x_offset = 0
 			case p.id
 			when 0
@@ -51,21 +51,21 @@ class Ball
 			end
 
 			if    (((@x + x_offset) >= (p.x - p.size[:w] / 2) && (@x + x_offset) <= (p.x + p.size[:w] / 2)) &&
-				     ((@y + @size / 2) >= (p.y - p.size[:h] / 2) && (@y + @size / 2) <= (p.y - p.size[:h] / 4)))
+				     ((@y + @size / 2) >= (p.y - p.size[:h] / 2) && @y < (p.y - p.size[:h] / 4)))
 				return {
 					target: :player,
 					pos: :top,
 					id: p.id
 				}
 			elsif (((@x + x_offset) >= (p.x - p.size[:w] / 2) && (@x + x_offset) <= (p.x + p.size[:w] / 2)) &&
-						 ((@y - @size / 2) >= (p.y + p.size[:h] / 4) && (@y - @size / 2) <= (p.y + p.size[:h] / 2)))
+						 (@y > (p.y + p.size[:h] / 4) && (@y - @size / 2) <= (p.y + p.size[:h] / 2)))
 				return {
 					target: :player,
 					pos: :bottom,
 					id: p.id
 				}
 			elsif (((@x + x_offset) >= (p.x - p.size[:w] / 2) && (@x + x_offset) <= (p.x + p.size[:w] / 2)) &&
-						 ((@y) >= (p.y - p.size[:h] / 4) && (@y - @size / 2) <= (p.y + p.size[:h] / 4)))
+						 (@y >= (p.y - p.size[:h] / 2) && @y <= (p.y + p.size[:h] / 2)))
 				return {
 					target: :player,
 					pos: :center,
@@ -160,31 +160,18 @@ class Ball
 				case coll[:side]
 				when :left
 					reset :right
-					found = false
-					@playing_area.players.each do |p|
+					@playing_area.pads.each do |p|
 						if (p.id == 1)
 							p.score += 1
-							found = true
 						end
 					end
-					@playing_area.cpu_players.each do |p|
-						if (p.id == 1)
-							p.score += 1
-						end
-					end  unless found
 				when :right
 					reset :left
-					@playing_area.players.each do |p|
+					@playing_area.pads.each do |p|
 						if (p.id == 0)
 							p.score += 1
-							found = true
 						end
 					end
-					@playing_area.cpu_players.each do |p|
-						if (p.id == 0)
-							p.score += 1
-						end
-					end  unless found
 				end
 
 			when :border
@@ -201,20 +188,20 @@ class Ball
 
 	def move
 		# Start moving after reset
-		return  if (Time.now < @reset_time)
 		@speed[:x].floor.times do |n|
-			handle_collision
 			@x +=  @dir[:x]
+			handle_collision
+			return  if (Time.now < @reset_time)
 		end
 		@speed[:y].floor.times do |n|
-			handle_collision
 			@y += @dir[:y]
+			handle_collision
+			return  if (Time.now < @reset_time)
 		end
 	end
 
 	def update
-		move
-		handle_collision
+		move  unless (Time.now < @reset_time)
 	end
 
 	def draw

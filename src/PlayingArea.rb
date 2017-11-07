@@ -1,17 +1,15 @@
 
 class PlayingArea
-	attr_reader :w, :h, :players, :balls, :cpu_players
+	attr_reader :w, :h, :pads, :balls
 
 	def initialize args
 		@w = args[:w]
 		@h = args[:h]
-		@players = [
-			Player.new(id: 0, playing_area: self)
-			#Pad.new(id: 1, playing_area: self)
-		]
-		@cpu_players = [
-			#CpuPad.new(id: 0, playing_area: self),
-			Cpu.new(id: 1, playing_area: self)
+		@pads = [
+			#Player.new(id: 0, playing_area: self)
+			Player.new(id: 1, playing_area: self),
+			Cpu.new(id: 0, playing_area: self),
+			#Cpu.new(id: 1, playing_area: self)
 		]
 		@balls = [
 			Ball.new(playing_area: self)
@@ -20,12 +18,13 @@ class PlayingArea
 
 	def update
 		# Update Cpu Players
-		@cpu_players.each &:update
+		@pads.each &:update
 		# Update Balls
 		@balls.each &:update
 
 		# Player controls
-		@players.each do |p|
+		@pads.each do |p|
+			next  if (p.class == Cpu)
 			p.controls.each do |k,v|
 				v.each do |btn|
 					p.move k  if (Gosu.button_down? btn)
@@ -40,9 +39,7 @@ class PlayingArea
 		Gosu.draw_rect 0,0, @w,@h, color
 
 		# Draw Players / Pads
-		@players.each &:draw
-		# Draw Cpu Players / Pads
-		@cpu_players.each &:draw
+		@pads.each &:draw
 
 		# Draw Ball(s)
 		@balls.each &:draw

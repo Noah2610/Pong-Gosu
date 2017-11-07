@@ -2,7 +2,7 @@
 class Cpu < Pad
 	def init
 		@color = Gosu::Color.argb 0xff_444444
-		@@move_padding = @size[:h] / 4
+		@@move_padding = @size[:h] / 3
 	end
 
 	def find_ball
@@ -11,6 +11,7 @@ class Cpu < Pad
 			dist: nil
 		}
 		@playing_area.balls.each do |ball|
+			next  if (ball.last_pad_hit == @id)
 			dist = Float::INFINITY
 			case @id
 			when 0
@@ -18,6 +19,7 @@ class Cpu < Pad
 			when 1
 				dist = @x - ball.x
 			end
+			next  if (dist > @playing_area.w * 0.75)
 			if (closest[:dist].nil? || dist < closest[:dist])
 				closest = {
 					ball: ball,
@@ -25,7 +27,7 @@ class Cpu < Pad
 				}
 			end
 		end
-		return closest[:ball]  unless (closest[:dist].nil? || closest[:dist] > @playing_area.w / 2)
+		return closest[:ball]
 	end
 
 	def update
