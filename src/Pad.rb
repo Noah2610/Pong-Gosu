@@ -23,7 +23,8 @@ class Pad
 		end
 
 		@controls = CONTROLS[@id]
-		@@step = 4
+		@@speed = 4
+		@speed = @@speed
 
 		init
 	end
@@ -32,11 +33,18 @@ class Pad
 	end
 
 	def move id
+		dir = 0
 		case id
 		when :up
-			@y -= @@step  unless (@y - (@size[:h] / 2) <= 0)
+			dir = -1  unless (@y - (@size[:h] / 2) <= 0)
 		when :down
-			@y += @@step  unless (@y + (@size[:h] / 2) >= @playing_area.h)
+			dir = 1   unless (@y + (@size[:h] / 2) >= @playing_area.h)
+		else
+			return
+		end
+
+		@speed.floor.times do |n|
+			@y += dir
 		end
 	end
 

@@ -7,9 +7,13 @@ class Panel
 		@y = args[:y]
 		@players = args[:players]
 		@cpu_players = args[:cpu_players]
+		@balls = args[:balls]
 		@@font = Gosu::Font.new 32
 		@@bgcolor = Gosu::Color.argb 0xff_444444
 		@@txtcolor = Gosu::Color.argb 0xff_ffffff
+		@@countdown_font = Gosu::Font.new 64
+		@@countdown_color = Gosu::Color.argb 0xff_4466ff
+		@@countdown_color_indicator = Gosu::Color.argb 0xff_888888
 	end
 
 	def draw
@@ -19,18 +23,35 @@ class Panel
 		@players.each do |p|
 			case p.id
 			when 0
-				@@font.draw p.score, (@x + 16),(@y + 16), 1, 1,1, @@txtcolor
+				@@font.draw_rel p.score, (@x + 42),(@y + @h / 2), 1, 0.5,0.5, 1,1, @@txtcolor
 			when 1
-				@@font.draw p.score, (@w - 32),(@y + 16), 1, 1,1, @@txtcolor
+				@@font.draw_rel p.score, (@w - 42),(@y + @h / 2), 1, 0.5,0.5, 1,1, @@txtcolor
 			end
 		end
 		# Draw Cpu Player scores
 		@cpu_players.each do |p|
 			case p.id
 			when 0
-				@@font.draw p.score, (@x + 16),(@y + 16), 1, 1,1, @@txtcolor
+				@@font.draw_rel p.score, (@x + 42),(@y + @h / 2), 1, 0.5,0.5, 1,1, @@txtcolor
 			when 1
-				@@font.draw p.score, (@w - 32),(@y + 16), 1, 1,1, @@txtcolor
+				@@font.draw_rel p.score, (@w - 42),(@y + @h / 2), 1, 0.5,0.5, 1,1, @@txtcolor
+			end
+		end
+
+		# Draw Ball countdown after reset
+		@balls.each do |ball|
+			if (Time.now <= ball.reset_time)
+				# Draw countdown
+				remaining = ((ball.reset_time - Time.now).to_i + 1).to_s
+				@@countdown_font.draw_rel remaining, (@x + @w / 2),(@y + @h / 2), 1, 0.5, 0.5, 1,1, @@countdown_color
+				# Draw direction indicator
+				if    (ball.dir[:x] == 1)
+					@@countdown_font.draw_rel ">", (@x + @w / 2), (@y + @h / 2), 1, -2, 0.5, 1,1, @@countdown_color_indicator
+				elsif (ball.dir[:x] == -1)
+					@@countdown_font.draw_rel "<", (@x + @w / 2), (@y + @h / 2), 1, 2, 0.5, 1,1, @@countdown_color_indicator
+				end
+			elsif (Time.now <= ball.reset_time + 1)
+				@@countdown_font.draw_rel "Go!", (@x + @w / 2),(@y + @h / 2), 1, 0.5, 0.5, 1,1, @@countdown_color
 			end
 		end
 	end

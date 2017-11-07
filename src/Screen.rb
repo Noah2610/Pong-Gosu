@@ -6,7 +6,7 @@ class Screen
 		@w = args[:w]
 		@h = args[:h]
 		@playing_area = PlayingArea.new w: @w, h: (@h - 64)
-		@panel = Panel.new w: @w, h: 64, x: 0, y: (@h - 64), players: @playing_area.players, cpu_players: @playing_area.cpu_players
+		@panel = Panel.new w: @w, h: 64, x: 0, y: (@h - 64), players: @playing_area.players, cpu_players: @playing_area.cpu_players, balls: @playing_area.balls
 	end
 
 	def draw

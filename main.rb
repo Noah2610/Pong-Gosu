@@ -25,7 +25,20 @@ CONTROLS = [
 	}
 ]
 
-BALL_START_SPEED_X = 4
+BALL_START_SPEED = {
+	x: 4,
+	y: 1
+}
+
+BALL_START_DIR = {
+	x: 1,
+	y: 0
+}
+
+BALL_SPEED_INCR = {
+	x: 0.5,
+	y: 1
+}
 
 class Game < Gosu::Window
 	def initialize

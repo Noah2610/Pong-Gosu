@@ -2,7 +2,6 @@
 class Cpu < Pad
 	def init
 		@color = Gosu::Color.argb 0xff_444444
-		@step = @@step
 		@@move_padding = @size[:h] / 2
 	end
 
@@ -34,19 +33,18 @@ class Cpu < Pad
 		ball = find_ball
 		return  if ball.nil?
 		# TODO: vvv make this better vvv
-		if ((ball.speed[:x] - BALL_START_SPEED_X) % 2 == 0)
-			@step = @@step + ball.speed[:x] / 2
-		elsif (ball.speed[:x] == BALL_START_SPEED_X)
-			@step = @@step
+		if ((ball.speed[:x] - BALL_START_SPEED[:x]) % 2 == 0)
+			@speed = @@speed + ball.speed[:x] / 2
+		elsif (ball.speed[:x] == BALL_START_SPEED[:x])
+			@speed = @@speed
 		end
-		unless (ball.nil?)
-			diff = ball.y - @y
-			return  if (diff.abs < @@move_padding)
-			if    (diff < 0)
-				move :up
-			elsif (diff > 0)
-				move :down
-			end
+
+		diff = ball.y - @y
+		return  if (diff.abs < @@move_padding)
+		if    (diff < 0)
+			move :up
+		elsif (diff > 0)
+			move :down
 		end
 	end
 end

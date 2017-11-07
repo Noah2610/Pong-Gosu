@@ -1,6 +1,6 @@
 
 class Ball
-	attr_reader :x, :y, :speed, :start_speed
+	attr_reader :x, :y, :speed, :reset_time, :dir
 
 	def initialize args
 		@playing_area = args[:playing_area]
@@ -10,11 +10,8 @@ class Ball
 		@y = args[:y]  if (!args[:y].nil?)
 		@size = 16
 		@color = Gosu::Color.argb 0xff_000000
-		@@speed_incr = 0.5
-		@@start_speed = {
-			x: BALL_START_SPEED_X,
-			y: 2
-		}
+		@@speed_incr = BALL_SPEED_INCR
+		@@start_speed = BALL_START_SPEED
 		@speed = @@start_speed.dup
 		@delay = args[:delay].nil? ? 0 : args[:delay]
 		@@timeout = 3
@@ -22,43 +19,48 @@ class Ball
 		@@samples = {
 			pad_hit: Gosu::Sample.new("./samples/pad_hit.ogg")
 		}
+		@dir = BALL_START_DIR.dup
+		@last_pad_hit = -1
 	end
 
-	def reset dir=:right
+	def reset dir = :right
 		@reset_time = Time.now + @@timeout
 		@x = @playing_area.w / 2
 		@y = @playing_area.h / 2
 		@speed = @@start_speed.dup
+		@last_pad_hit = -1
 		case dir
 		when :left
-			@speed[:x] = @speed[:x].abs * -1
+			@dir[:x] = -1
+			@dir[:y] = BALL_START_DIR[:y] * (rand(2) == 0 ? 1 : -1)
 		when :right
-			@speed[:x] = @speed[:x].abs
+			@dir[:x] = 1
+			@dir[:y] = BALL_START_DIR[:y] * (rand(2) == 0 ? 1 : -1)
 		end
 	end
 
 	def collision
 		# Collision checking - Players / Pads
 		Array.new.concat(@playing_area.players,@playing_area.cpu_players).each do |p|
-			if    (((@x + @size / 2) >= (p.x - p.size[:w] / 2) && (@x - @size / 2) < (p.x + p.size[:w] / 2)) &&
-				    ((@y + @size / 2) >= (p.y - p.size[:h] / 2) && (@y - @size / 2) < (p.y - p.size[:h] / 4)))
+			if    (((@x + @size / 2) >= (p.x - p.size[:w] / 2) && (@x - @size / 2) <= (p.x + p.size[:w] / 2)) &&
+				     ((@y + @size / 2) >= (p.y - p.size[:h] / 2) && (@y + @size / 2) <= (p.y - p.size[:h] / 4)))
 				return {
 					target: :player,
 					pos: :top,
 					id: p.id
 				}
 			elsif (((@x + @size / 2) >= (p.x - p.size[:w] / 2) && (@x - @size / 2) <= (p.x + p.size[:w] / 2)) &&
-						 ((@y + @size / 2) >= (p.y - p.size[:h] / 4) && (@y - @size / 2) <= (p.y + p.size[:h] / 4)))
-				return {
-					target: :player,
-					pos: :center,
-					id: p.id
-				}
-			elsif (((@x + @size / 2) >= (p.x - p.size[:w] / 2) && (@x - @size / 2) <= (p.x + p.size[:w] / 2)) &&
-						 ((@y + @size / 2) >= (p.y + p.size[:h] / 4) && (@y - @size / 2) <= (p.y + p.size[:h] / 2)))
+						 ((@y - @size / 2) >= (p.y + p.size[:h] / 4) && (@y - @size / 2) <= (p.y + p.size[:h] / 2)))
 				return {
 					target: :player,
 					pos: :bottom,
+					id: p.id
+				}
+			elsif (((@x) >= (p.x - p.size[:w] / 2) && (@x - @size / 2) <= (p.x + p.size[:w] / 2)) &&
+						 ((@y) >= (p.y - p.size[:h] / 4) && (@y - @size / 2) <= (p.y + p.size[:h] / 4)))
+				return {
+					target: :player,
+					pos: :center,
 					id: p.id
 				}
 			end
@@ -96,40 +98,70 @@ class Ball
 	def move
 		# Start moving after reset
 		return  if (Time.now < @reset_time)
-		@x += @speed[:x]
-		@y += @speed[:y]
+		puts @speed.to_s
+		@speed[:x].floor.times do |n|
+			@x += 1 * @dir[:x]
+		end
+		@speed[:y].floor.times do |n|
+			@y += 1 * @dir[:y]
+		end
 	end
 
 	def update
 		move
 		coll = collision
 		if (coll)
-			# Change direction
 			case coll[:target]
 			# Player collision
 			when :player
-				# Play sample
-				@@samples[:pad_hit].play 0.5, 2
 				case coll[:id]
 				when 0
-					@speed[:x] = @speed[:x].abs
-					@speed[:x] += (@speed[:x] > 0) ? @@speed_incr : -@@speed_incr
+					return  if (@last_pad_hit == 0)
+					@speed[:x] += @@speed_incr[:x]
+					@dir[:x] = 1
+					@last_pad_hit = 0
 				when 1
-					@speed[:x] = @speed[:x].abs * -1
-					@speed[:x] += (@speed[:x] > 0) ? @@speed_incr : -@@speed_incr
+					return  if (@last_pad_hit == 1)
+					@speed[:x] += @@speed_incr[:x]
+					@dir[:x] = -1
+					@last_pad_hit = 1
 				end
+				# Play sample
+				@@samples[:pad_hit].play 0.5, 2
 				# Change y speed
 				case coll[:pos]
 				when :top
-					@speed[:y] -= @@speed_incr
+					case @dir[:y]
+					when 0
+						@speed[:y] = @@speed_incr[:y]
+						@dir[:y] = -1
+					when 1
+						@speed[:y] -= @@speed_incr[:y]
+						if (@speed[:y] < 1)
+							@speed[:y] = 0
+							@dir[:y] = 0
+						end
+					when -1
+						@speed[:y] += @@speed_incr[:y]
+					end
 				when :center
 				when :bottom
-					@speed[:y] += @@speed_incr
+					case @dir[:y]
+					when 0
+						@speed[:y] = @@speed_incr[:y]
+						@dir[:y] = 1
+					when -1
+						@speed[:y] -= @@speed_incr[:y]
+						if (@speed[:y] < 1)
+							@speed[:y] = 0
+							@dir[:y] = 0
+						end
+					when 1
+						@speed[:y] += @@speed_incr[:y]
+					end
 				end
 
-			# Border x collision
 			when :goal
-			# Border y collision
 				case coll[:side]
 				when :left
 					reset :right
@@ -163,9 +195,9 @@ class Ball
 			when :border
 				case coll[:side]
 				when :bottom
-					@speed[:y] = @speed[:y].abs * -1
+					@dir[:y] = -1
 				when :top
-					@speed[:y] = @speed[:y].abs
+					@dir[:y] = 1
 				end
 
 			end
@@ -175,17 +207,6 @@ class Ball
 	def draw
 		# Draw Ball
 		Gosu.draw_rect (@x - (@size / 2)), (@y - (@size / 2)), @size, @size, @color
-		# Draw countdown after reset
-		if (Time.now <= @reset_time)
-			# Draw countdown
-			remaining = ((@reset_time - Time.now).to_i + 1).to_s
-			font = Gosu::Font.new 64
-			font.draw_rel remaining, (@playing_area.w / 2),(@playing_area.h / 2 - 64), 1, 0.5, 0.5, 1,1, Gosu::Color.argb(0xff_ffff00)
-			# Draw direction indicator
-			font.draw_rel (@speed[:x] > 0 ? ">" : (@speed[:x] < 0 ? "<" : "-")), (@playing_area.w / 2),(@playing_area.h / 2 - 128), 1, 0.5, 0.5, 1,1, Gosu::Color.argb(0xff_ff0000)
-		elsif (Time.now <= @reset_time + 1)
-			Gosu::Font.new(64).draw_rel "Go!", (@playing_area.w / 2),(@playing_area.h / 2 - 64), 1, 0.5, 0.5, 1,1, Gosu::Color.argb(0xff_ffff00)
-		end
 	end
 end
 
