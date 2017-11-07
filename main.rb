@@ -2,19 +2,19 @@
 require 'gosu'
 require './src/Screen'
 require './src/PlayingArea'
-require './src/Pad'
 require './src/Ball'
 require './src/Panel'
-require './src/CpuPad'
+require './src/Pad'
+require './src/Player'
+require './src/Cpu'
+#require './src/CpuPad'
 
-# TODO: replace global vars with constants
-
-$screen_res = {
+SCREEN_RES = {
 	w: 800,
 	h: 520
 }
 
-$controls = [
+CONTROLS = [
 	{
 		up:    [Gosu::KB_W],
 		down:  [Gosu::KB_S]
@@ -29,7 +29,7 @@ BALL_START_SPEED_X = 4
 
 class Game < Gosu::Window
 	def initialize
-		@screen = Screen.new w: $screen_res[:w], h: $screen_res[:h]
+		@screen = Screen.new w: SCREEN_RES[:w], h: SCREEN_RES[:h]
 		super @screen.w, @screen.h
 		self.caption = "Pong!"
 	end
@@ -42,19 +42,7 @@ class Game < Gosu::Window
 	end
 
 	def update
-		# Update Ball(s)
-		@screen.playing_area.balls.each &:update
-		# AI for CpuPad(s)
-		@screen.playing_area.cpu_players.each &:update
-
-		# Player / Pad controls
-		@screen.playing_area.players.each do |p|
-			p.controls.each do |k,v|
-				v.each do |btn|
-					p.move k  if (Gosu.button_down? btn)
-				end
-			end
-		end
+		@screen.playing_area.update
 	end
 
 	def draw

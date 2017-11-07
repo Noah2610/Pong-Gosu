@@ -6,16 +6,32 @@ class PlayingArea
 		@w = args[:w]
 		@h = args[:h]
 		@players = [
-			Pad.new(id: 0, playing_area: self)
+			Player.new(id: 0, playing_area: self)
 			#Pad.new(id: 1, playing_area: self)
 		]
 		@cpu_players = [
 			#CpuPad.new(id: 0, playing_area: self),
-			CpuPad.new(id: 1, playing_area: self)
+			Cpu.new(id: 1, playing_area: self)
 		]
 		@balls = [
 			Ball.new(playing_area: self),
 		]
+	end
+
+	def update
+		# Update Cpu Players
+		@cpu_players.each &:update
+		# Update Balls
+		@balls.each &:update
+
+		# Player controls
+		@players.each do |p|
+			p.controls.each do |k,v|
+				v.each do |btn|
+					p.move k  if (Gosu.button_down? btn)
+				end
+			end
+		end
 	end
 
 	def draw

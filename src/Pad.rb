@@ -22,8 +22,13 @@ class Pad
 			@x = 0
 		end
 
-		@controls = $controls[@id]
+		@controls = CONTROLS[@id]
 		@@step = 4
+
+		init
+	end
+
+	def init
 	end
 
 	def move id
