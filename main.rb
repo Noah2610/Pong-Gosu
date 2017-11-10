@@ -17,7 +17,7 @@ SCREEN_RES = {
 
 CONTROLS = [
 	{
-		up:    [Gosu::KB_W],
+		up:    [Gosu::KB_W, Gosu::KB_D],
 		down:  [Gosu::KB_S]
 	},
 	{
