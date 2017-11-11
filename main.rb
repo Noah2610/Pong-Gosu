@@ -1,6 +1,8 @@
 
 require 'gosu'
 require 'byebug'
+require './src/Buttons'
+require './src/Menu'
 require './src/Screen'
 require './src/PlayingArea'
 require './src/Ball'
@@ -15,16 +17,18 @@ SCREEN_RES = {
 	h: 520
 }
 
-CONTROLS = [
+DEFAULT_CONTROLS = [
 	{
 		up:    [Gosu::KB_W, Gosu::KB_D],
-		down:  [Gosu::KB_S]
+		down:  [Gosu::KB_S],
 	},
 	{
 		up:    [Gosu::KB_UP, Gosu::KB_K],
 		down:  [Gosu::KB_DOWN, Gosu::KB_J]
 	}
 ]
+
+CONTROLS = DEFAULT_CONTROLS
 
 BALL_START_SPEED = {
 	x: 4,
@@ -41,6 +45,15 @@ BALL_SPEED_INCR = {
 	y: 1
 }
 
+valid_buttons = {}
+(4..29).to_a.each do |id|
+	valid_buttons[id] = nil
+end
+("A".."Z").to_a.each_with_index do |btn,count|
+	valid_buttons[count + 4] = btn
+end
+VALID_BUTTONS = valid_buttons
+
 class Game < Gosu::Window
 	def initialize
 		@screen = Screen.new w: SCREEN_RES[:w], h: SCREEN_RES[:h]
@@ -52,11 +65,19 @@ class Game < Gosu::Window
 		case id
 		when Gosu::KB_Q
 			close
+		when Gosu::MS_LEFT, Gosu::MS_RIGHT, Gosu::MS_MIDDLE
+			@screen.click
+		else
+			@screen.button_down id
 		end
 	end
 
+	def needs_cursor?
+		!$game_running
+	end
+
 	def update
-		@screen.playing_area.update
+		@screen.update
 	end
 
 	def draw
@@ -64,6 +85,7 @@ class Game < Gosu::Window
 	end
 end
 
-game = Game.new
-game.show
+$game_running = false
+$game = Game.new
+$game.show
 

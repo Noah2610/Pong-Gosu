@@ -1,8 +1,5 @@
 
-Classes:
-	- Screen
-	- PlayingArea
-	(- Buffer)
-	- Pad / Player
-	- Ball
+TODO:
+	- Menu (Class):
+		- Settings
 

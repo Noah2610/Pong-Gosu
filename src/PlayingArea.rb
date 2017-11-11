@@ -12,11 +12,18 @@ class PlayingArea
 			#Cpu.new(id: 1, playing_area: self)
 		]
 		@ball_delay = 3
-		@balls = [
-			Ball.new(playing_area: self, side: (rand(2) == 0 ? :left : :right), delay: @ball_delay)
-		]
+		@balls = []
 		@new_ball_delay_sec = 20 + @ball_delay
 		@new_ball_at = nil
+	end
+
+	def set_control args
+		@pads.each do |p|
+			if (p.class == Player && p.id == args[:id])
+				return p.update_control dir: args[:dir], key: args[:key]
+			end
+		end
+		return nil
 	end
 
 	def new_ball
@@ -38,6 +45,7 @@ class PlayingArea
 	end
 
 	def handle_new_ball
+		return
 		if (!@new_ball_at.nil? && @new_ball_at < Time.now)
 			new_ball  unless (@new_ball_at.nil?)
 			@new_ball_at = Time.now + @new_ball_delay_sec
@@ -69,23 +77,19 @@ class PlayingArea
 		end
 	end
 
-	def update
-		handle_new_ball
+	def start_game
+		$game_running = true
+		new_ball
+	end
 
+	def update
 		# Update Cpu Players
 		@pads.each &:update
-		# Update Balls
-		@balls.each &:update
-
-		# Player controls
-		@pads.each do |p|
-			next  if (p.class == Cpu)
-			p.controls.each do |k,v|
-				v.each do |btn|
-					p.move k  if (Gosu.button_down? btn)
-				end
-			end
+		if ($game_running)
+			handle_new_ball
+			@balls.each &:update
 		end
+
 	end
 
 	def draw
@@ -97,7 +101,7 @@ class PlayingArea
 		@pads.each &:draw
 
 		# Draw Ball(s)
-		@balls.each &:draw
+		@balls.each &:draw  if ($game_running)
 	end
 end
 

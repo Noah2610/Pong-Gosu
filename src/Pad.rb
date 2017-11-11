@@ -1,6 +1,6 @@
 
 class Pad
-	attr_reader :id, :x,:y, :controls, :size
+	attr_reader :id, :x,:y, :size
 	attr_accessor :score
 
 	def initialize args
@@ -32,6 +32,12 @@ class Pad
 	def init
 	end
 	def update
+		# Player controls
+		@controls.each do |k,v|
+			v.each do |btn|
+				move k  if (Gosu.button_down? btn)
+			end
+		end
 	end
 
 	def move id
