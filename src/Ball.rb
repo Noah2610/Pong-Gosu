@@ -30,6 +30,7 @@ class Ball
 		end
 		@last_pad_hit = -1
 		@destroy = false
+		@@timeout_unpause = 1
 	end
 
 =begin
@@ -49,6 +50,10 @@ class Ball
 		end
 	end
 =end
+
+	def add_delay
+		@reset_time = Time.now + @@timeout_unpause
+	end
 
 	def collision target = :all
 		# Collision checking - Players / Pads
@@ -198,9 +203,7 @@ class Ball
 	end
 
 	def update
-		if (!$game_paused)
-			move  unless (Time.now < @reset_time)
-		end
+		move  unless (Time.now < @reset_time)
 	end
 
 	def draw

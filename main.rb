@@ -81,7 +81,7 @@ class Game < Gosu::Window
 	end
 
 	def update
-		@screen.update
+		@screen.update  unless ($game_paused)
 	end
 
 	def draw

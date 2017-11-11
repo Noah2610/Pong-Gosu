@@ -105,13 +105,18 @@ class PlayingArea
 		PAUSE_BUTTON.each do |pbtn|
 			if (id == pbtn)
 				$game_paused = !$game_paused
+				if (!$game_paused)
+					@balls.each do |ball|
+						ball.add_delay
+					end
+				end
 				return
 			end
 		end
 	end
 
 	def update
-		@pads.each &:update  unless ($game_paused)
+		@pads.each &:update
 		if ($game_running)
 			handle_new_ball
 			@balls.each &:update

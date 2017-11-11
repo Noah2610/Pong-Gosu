@@ -43,7 +43,7 @@ class Panel
 			elsif (Time.now <= ball.reset_time + 1)
 				@@countdown_font.draw_rel "Go!", (@x + @w / 2),(@y + @h / 2), 1, 0.5, 0.5, 1,1, @@countdown_color
 			end
-		end
+		end  unless ($game_paused)
 	end
 end
 
