@@ -25,7 +25,7 @@ class Button
 		@font = Gosu::Font.new(args[:font_size] || 24)
 		@text = "BUTTON"
 		@last_in_collision = false
-		@show = true
+		@show = false
 		init args  if (defined? init)
 	end
 
@@ -48,35 +48,35 @@ class Button
 	end
 
 	def click
+		return  if (!@show || @menu.has_clicked)
 		if (@last_in_collision)
+			@menu.has_clicked = true
 			click!
 		end
 	end
 
 	def update
-		if (@show)
-			# Check collision with mouse
-			in_collision = collision? $game.mouse_x, $game.mouse_y
-			if (in_collision)
-				@color = @hover_color
-			else
-				@color = @default_color
-			end
-			@last_in_collision = in_collision
+		return  unless (@show)
+		# Check collision with mouse
+		in_collision = collision? $game.mouse_x, $game.mouse_y
+		if (in_collision)
+			@color = @hover_color
+		else
+			@color = @default_color
 		end
+		@last_in_collision = in_collision
 	end
 
 	def draw
-		if (@show)
-			x = @x - (@size[:w] / 2)
-			y = @y - (@size[:h] / 2)
-			# Draw border
-			Gosu.draw_rect x,y, (@size[:w]),(@size[:h]), @color[:border]
-			# Draw bg
-			Gosu.draw_rect (x + @border_width),(y + @border_width), (@size[:w] - @border_width * 2),(@size[:h] - @border_width * 2), @color[:bg]
-			# Draw text
-			@font.draw_rel @text, @x,@y, 1, 0.5,0.5, 1,1, @color[:fg]
-		end
+		return  unless (@show)
+		x = @x - (@size[:w] / 2)
+		y = @y - (@size[:h] / 2)
+		# Draw border
+		Gosu.draw_rect x,y, (@size[:w]),(@size[:h]), @color[:border]
+		# Draw bg
+		Gosu.draw_rect (x + @border_width),(y + @border_width), (@size[:w] - @border_width * 2),(@size[:h] - @border_width * 2), @color[:bg]
+		# Draw text
+		@font.draw_rel @text, @x,@y, 1, 0.5,0.5, 1,1, @color[:fg]
 	end
 end
 
@@ -100,6 +100,12 @@ class ControlSelectButton < Button
 		@text = VALID_BUTTONS[@menu.screen.playing_area.player(@pid).controls[@dir][0]]
 		@@active = nil
 		@show = false  if (@menu.screen.playing_area.player(@pid).class == Cpu)
+	end
+
+	def show
+		unless (@menu.screen.playing_area.player(@pid).class == Cpu)
+			@show = true
+		end
 	end
 
 	def button_down id
@@ -154,6 +160,29 @@ class TogglePadTypeButton < Button
 		@text = @state.to_s.upcase
 		@menu.screen.playing_area.set_pad id: @pid, type: @state
 		@menu.update_buttons pid: @pid
+	end
+end
+
+
+class ShowSettingsButton < Button
+	def init args
+		@text = "Settings"
+	end
+
+	def click!
+		@menu.show_settings
+	end
+end
+
+
+
+class ShowMainButton < Button
+	def init args
+		@text = "Back"
+	end
+
+	def click!
+		@menu.show_main
 	end
 end
 

@@ -1,6 +1,6 @@
 
 class Screen
-	attr_reader :w, :h, :playing_area
+	attr_reader :w, :h, :playing_area, :menu
 
 	def initialize args
 		@w = args[:w]

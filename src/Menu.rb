@@ -1,43 +1,50 @@
 
 class Menu
 	attr_reader :screen
+	attr_accessor :has_clicked
 
 	def initialize args
 		@screen = args[:screen]
+		@show = true
+		@has_clicked = false
 		@buttons = [
-			StartButton.new(menu: self),
+			StartButton.new(
+				menu:  self,
+				x:     (@screen.playing_area.w / 2),
+				y:     (@screen.playing_area.h / 2 - 32)
+			),
 			# Set Player control buttons
 			ControlSelectButton.new(
-				menu: self,
-				x:    (@screen.playing_area.w / 4),
-				y:    (@screen.playing_area.h / 2 - 24),
-				size: { w: 32, h: 32 },
-				pid:  0,
-				dir:  :up
+				menu:  self,
+				x:     (@screen.playing_area.w / 4),
+				y:     (@screen.playing_area.h / 2 - 24),
+				size:  { w: 32, h: 32 },
+				pid:   0,
+				dir:   :up
 			),
 			ControlSelectButton.new(
-				menu: self,
-				x:    (@screen.playing_area.w / 4),
-				y:    (@screen.playing_area.h / 2 + 24),
-				size: { w: 32, h: 32 },
-				pid:  0,
-				dir:  :down
+				menu:  self,
+				x:     (@screen.playing_area.w / 4),
+				y:     (@screen.playing_area.h / 2 + 24),
+				size:  { w: 32, h: 32 },
+				pid:   0,
+				dir:   :down
 			),
 			ControlSelectButton.new(
-				menu: self,
-				x:    ((@screen.playing_area.w / 4) * 3),
-				y:    (@screen.playing_area.h / 2 - 24),
-				size: { w: 32, h: 32 },
-				pid:  1,
-				dir:  :up
+				menu:  self,
+				x:     ((@screen.playing_area.w / 4) * 3),
+				y:     (@screen.playing_area.h / 2 - 24),
+				size:  { w: 32, h: 32 },
+				pid:   1,
+				dir:   :up
 			),
 			ControlSelectButton.new(
-				menu: self,
-				x:    ((@screen.playing_area.w / 4) * 3),
-				y:    (@screen.playing_area.h / 2 + 24),
-				size: { w: 32, h: 32 },
-				pid:  1,
-				dir:  :down
+				menu:  self,
+				x:     ((@screen.playing_area.w / 4) * 3),
+				y:     (@screen.playing_area.h / 2 + 24),
+				size:  { w: 32, h: 32 },
+				pid:   1,
+				dir:   :down
 			),
 			# Toggle Pad Type buttons
 			TogglePadTypeButton.new(
@@ -53,8 +60,22 @@ class Menu
 				state: :cpu,
 				x:     ((@screen.playing_area.w / 4) * 3),
 				y:     (@screen.playing_area.h / 2 + 128),
+			),
+			ShowSettingsButton.new(
+				menu:  self,
+				x:     (@screen.playing_area.w / 2),
+				y:     (@screen.playing_area.h / 2 + 32)
 			)
 		]
+
+		@buttons_settings = [
+			ShowMainButton.new(
+				menu:  self,
+				x:     (@screen.playing_area.w / 2),
+				y:     (@screen.playing_area.h / 2 + 32)
+			)
+		]
+
 		@title = {
 			text:   "Pong!",
 			font:   Gosu::Font.new(64),
@@ -69,6 +90,18 @@ class Menu
 			x:      (@screen.playing_area.w / 2),
 			y:      (@screen.playing_area.h - 32)
 		}
+
+		show_main
+	end
+
+	def show_main
+		@buttons_settings.each &:hide
+		@buttons.each &:show
+	end
+
+	def show_settings
+		@buttons.each &:hide
+		@buttons_settings.each &:show
 	end
 
 	def update_buttons args
@@ -97,10 +130,12 @@ class Menu
 
 	def click
 		@buttons.each &:click
+		@buttons_settings.each &:click
 	end
 
 	def update
 		@buttons.each &:update
+		@buttons_settings.each &:update
 	end
 
 	def draw
@@ -112,6 +147,7 @@ class Menu
 		end
 		# Draw buttons
 		@buttons.each &:draw
+		@buttons_settings.each &:draw
 	end
 end
 

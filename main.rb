@@ -76,6 +76,13 @@ class Game < Gosu::Window
 		end
 	end
 
+	def button_up id
+		case id
+		when Gosu::MS_LEFT, Gosu::MS_RIGHT, Gosu::MS_MIDDLE
+			@screen.menu.has_clicked = false
+		end
+	end
+
 	def needs_cursor?
 		!$game_running
 	end

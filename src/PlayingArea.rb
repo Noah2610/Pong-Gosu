@@ -7,8 +7,6 @@ class PlayingArea
 		@h = args[:h]
 		@pads = [
 			Player.new(id: 0, playing_area: self),
-			#Player.new(id: 1, playing_area: self),
-			#Cpu.new(id: 0, playing_area: self)
 			Cpu.new(id: 1, playing_area: self)
 		]
 		@ball_delay = 3
