@@ -7,9 +7,9 @@ class PlayingArea
 		@h = args[:h]
 		@pads = [
 			Player.new(id: 0, playing_area: self),
-			Player.new(id: 1, playing_area: self),
+			#Player.new(id: 1, playing_area: self),
 			#Cpu.new(id: 0, playing_area: self)
-			#Cpu.new(id: 1, playing_area: self)
+			Cpu.new(id: 1, playing_area: self)
 		]
 		@ball_delay = 3
 		@balls = []
@@ -17,10 +17,28 @@ class PlayingArea
 		@new_ball_at = nil
 	end
 
+	def set_pad args
+		case args[:type]
+		when :player
+			@pads[args[:id]] = Player.new id: args[:id], playing_area: self
+		when :cpu
+			@pads[args[:id]] = Cpu.new id: args[:id], playing_area: self
+		end
+	end
+
 	def set_control args
 		@pads.each do |p|
 			if (p.class == Player && p.id == args[:id])
 				return p.update_control dir: args[:dir], key: args[:key]
+			end
+		end
+		return nil
+	end
+
+	def player id
+		@pads.each do |p|
+			if (id == p.id)
+				return p
 			end
 		end
 		return nil

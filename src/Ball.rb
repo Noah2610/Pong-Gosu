@@ -186,7 +186,7 @@ class Ball
 	def move
 		# Start moving after reset
 		@speed[:x].floor.times do |n|
-			@x +=  @dir[:x]
+			@x += @dir[:x]
 			handle_collision
 			return  if (Time.now < @reset_time || @destroy)
 		end

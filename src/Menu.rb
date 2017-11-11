@@ -6,6 +6,7 @@ class Menu
 		@screen = args[:screen]
 		@buttons = [
 			StartButton.new(menu: self),
+			# Set Player control buttons
 			ControlSelectButton.new(
 				menu: self,
 				x:    (@screen.playing_area.w / 4),
@@ -37,6 +38,21 @@ class Menu
 				size: { w: 32, h: 32 },
 				pid:  1,
 				dir:  :down
+			),
+			# Toggle Pad Type buttons
+			TogglePadTypeButton.new(
+				menu:  self,
+				pid:   0,
+				state: :player,
+				x:     (@screen.playing_area.w / 4),
+				y:     (@screen.playing_area.h / 2 + 128),
+			),
+			TogglePadTypeButton.new(
+				menu:  self,
+				pid:   1,
+				state: :cpu,
+				x:     ((@screen.playing_area.w / 4) * 3),
+				y:     (@screen.playing_area.h / 2 + 128),
 			)
 		]
 		@title = {
@@ -53,6 +69,19 @@ class Menu
 			x:      (@screen.playing_area.w / 2),
 			y:      (@screen.playing_area.h - 32)
 		}
+	end
+
+	def update_buttons args
+		@buttons.each do |btn|
+			if (btn.class == ControlSelectButton && btn.pid == args[:pid])
+				case @screen.playing_area.player(args[:pid]).class.to_s.to_sym
+				when :Player
+					btn.show
+				when :Cpu
+					btn.hide
+				end
+			end
+		end
 	end
 
 	def button_down id

@@ -52,6 +52,10 @@ end
 ("A".."Z").to_a.each_with_index do |btn,count|
 	valid_buttons[count + 4] = btn
 end
+valid_buttons[82] = "/\\"  # up
+valid_buttons[81] = "\\/"  # down
+valid_buttons[80] = "<"    # left
+valid_buttons[79] = ">"    # right
 VALID_BUTTONS = valid_buttons
 
 class Game < Gosu::Window

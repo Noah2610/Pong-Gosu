@@ -1,6 +1,6 @@
 
 class Pad
-	attr_reader :id, :x,:y, :size
+	attr_reader :id, :x,:y, :size, :controls
 	attr_accessor :score
 
 	def initialize args
