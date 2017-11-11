@@ -100,14 +100,22 @@ class PlayingArea
 		new_ball
 	end
 
+	def button_down id
+		# Check for pause button
+		PAUSE_BUTTON.each do |pbtn|
+			if (id == pbtn)
+				$game_paused = !$game_paused
+				return
+			end
+		end
+	end
+
 	def update
-		# Update Cpu Players
-		@pads.each &:update
+		@pads.each &:update  unless ($game_paused)
 		if ($game_running)
 			handle_new_ball
 			@balls.each &:update
 		end
-
 	end
 
 	def draw

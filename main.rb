@@ -30,6 +30,8 @@ DEFAULT_CONTROLS = [
 
 CONTROLS = DEFAULT_CONTROLS
 
+PAUSE_BUTTON = [Gosu::KB_P, Gosu::KB_ESCAPE]
+
 BALL_START_SPEED = {
 	x: 4,
 	y: 0
@@ -69,8 +71,6 @@ class Game < Gosu::Window
 		case id
 		when Gosu::KB_Q
 			close
-		when Gosu::MS_LEFT, Gosu::MS_RIGHT, Gosu::MS_MIDDLE
-			@screen.click
 		else
 			@screen.button_down id
 		end
@@ -90,6 +90,7 @@ class Game < Gosu::Window
 end
 
 $game_running = false
+$game_paused = false
 $game = Game.new
 $game.show
 

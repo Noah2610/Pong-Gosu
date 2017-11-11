@@ -87,8 +87,11 @@ class Menu
 	def button_down id
 		@buttons.each do |btn|
 			if (btn.class == ControlSelectButton)
-				btn.button_down id
+				return  if (btn.button_down id)
 			end
+		end
+		if (!$game_running && (id == Gosu::KB_SPACE || id == Gosu::KB_RETURN))
+			@screen.playing_area.start_game
 		end
 	end
 

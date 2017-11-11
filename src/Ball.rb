@@ -198,7 +198,9 @@ class Ball
 	end
 
 	def update
-		move  unless (Time.now < @reset_time)
+		if (!$game_paused)
+			move  unless (Time.now < @reset_time)
+		end
 	end
 
 	def draw

@@ -109,7 +109,9 @@ class ControlSelectButton < Button
 				@text = VALID_BUTTONS[ret]
 				@@active = nil
 			end
+			return true
 		end
+		return false
 	end
 
 	def click!
