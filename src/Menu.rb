@@ -7,74 +7,87 @@ class Menu
 		@screen = args[:screen]
 		@show = true
 		@has_clicked = false
-		@buttons = [
-			StartButton.new(
-				menu:  self,
-				x:     (@screen.playing_area.w / 2),
-				y:     (@screen.playing_area.h / 2 - 32)
-			),
-			# Set Player control buttons
-			ControlSelectButton.new(
-				menu:  self,
-				x:     (@screen.playing_area.w / 4),
-				y:     (@screen.playing_area.h / 2 - 24),
-				size:  { w: 32, h: 32 },
-				pid:   0,
-				dir:   :up
-			),
-			ControlSelectButton.new(
-				menu:  self,
-				x:     (@screen.playing_area.w / 4),
-				y:     (@screen.playing_area.h / 2 + 24),
-				size:  { w: 32, h: 32 },
-				pid:   0,
-				dir:   :down
-			),
-			ControlSelectButton.new(
-				menu:  self,
-				x:     ((@screen.playing_area.w / 4) * 3),
-				y:     (@screen.playing_area.h / 2 - 24),
-				size:  { w: 32, h: 32 },
-				pid:   1,
-				dir:   :up
-			),
-			ControlSelectButton.new(
-				menu:  self,
-				x:     ((@screen.playing_area.w / 4) * 3),
-				y:     (@screen.playing_area.h / 2 + 24),
-				size:  { w: 32, h: 32 },
-				pid:   1,
-				dir:   :down
-			),
-			# Toggle Pad Type buttons
-			TogglePadTypeButton.new(
-				menu:  self,
-				pid:   0,
-				state: :player,
-				x:     (@screen.playing_area.w / 4),
-				y:     (@screen.playing_area.h / 2 + 128),
-			),
-			TogglePadTypeButton.new(
-				menu:  self,
-				pid:   1,
-				state: :cpu,
-				x:     ((@screen.playing_area.w / 4) * 3),
-				y:     (@screen.playing_area.h / 2 + 128),
-			),
-			ShowSettingsButton.new(
-				menu:  self,
-				x:     (@screen.playing_area.w / 2),
-				y:     (@screen.playing_area.h / 2 + 32)
-			)
-		]
+		@buttons = {
+			main: [
+				StartButton.new(
+					menu:  self,
+					x:     (@screen.playing_area.w / 2),
+					y:     (@screen.playing_area.h / 2)
+				),
+				# Set Player control buttons
+				ControlSelectButton.new(
+					menu:  self,
+					x:     (@screen.playing_area.w / 4),
+					y:     (@screen.playing_area.h / 2 - 24),
+					size:  { w: 32, h: 32 },
+					pid:   0,
+					dir:   :up
+				),
+				ControlSelectButton.new(
+					menu:  self,
+					x:     (@screen.playing_area.w / 4),
+					y:     (@screen.playing_area.h / 2 + 24),
+					size:  { w: 32, h: 32 },
+					pid:   0,
+					dir:   :down
+				),
+				ControlSelectButton.new(
+					menu:  self,
+					x:     ((@screen.playing_area.w / 4) * 3),
+					y:     (@screen.playing_area.h / 2 - 24),
+					size:  { w: 32, h: 32 },
+					pid:   1,
+					dir:   :up
+				),
+				ControlSelectButton.new(
+					menu:  self,
+					x:     ((@screen.playing_area.w / 4) * 3),
+					y:     (@screen.playing_area.h / 2 + 24),
+					size:  { w: 32, h: 32 },
+					pid:   1,
+					dir:   :down
+				),
+				# Toggle Pad Type buttons
+				TogglePadTypeButton.new(
+					menu:  self,
+					pid:   0,
+					state: :player,
+					x:     (@screen.playing_area.w / 4),
+					y:     ((@screen.playing_area.h / 4) * 3)
+				),
+				TogglePadTypeButton.new(
+					menu:  self,
+					pid:   1,
+					state: :cpu,
+					x:     ((@screen.playing_area.w / 4) * 3),
+					y:     ((@screen.playing_area.h / 4) * 3)
+				),
+				ShowSettingsButton.new(
+					menu:  self,
+					x:     (@screen.playing_area.w / 2),
+					y:     ((@screen.playing_area.h / 4) * 3)
+				)
+			],
 
-		@buttons_settings = [
-			ShowMainButton.new(
-				menu:  self,
-				x:     (@screen.playing_area.w / 2),
-				y:     (@screen.playing_area.h / 2 + 32)
-			)
-		]
+			settings: [
+				ShowMainButton.new(
+					menu:  self,
+					x:     (@screen.playing_area.w / 2),
+					y:     ((@screen.playing_area.h / 4) * 3)
+				)
+			]
+		}
+
+		@inputs = {
+			main: [],
+			settings: [
+				TestInput.new(
+					menu: self,
+					x:    (@screen.playing_area.w / 2),
+					y:    (@screen.playing_area.h / 2)
+				)
+			]
+		}
 
 		@title = {
 			text:   "Pong!",
@@ -95,17 +108,21 @@ class Menu
 	end
 
 	def show_main
-		@buttons_settings.each &:hide
-		@buttons.each &:show
+		@buttons[:settings].each &:hide
+		@buttons[:main].each &:show
+		@inputs[:settings].each &:hide
+		@inputs[:main].each &:show
 	end
 
 	def show_settings
-		@buttons.each &:hide
-		@buttons_settings.each &:show
+		@buttons[:main].each &:hide
+		@buttons[:settings].each &:show
+		@inputs[:main].each &:hide
+		@inputs[:settings].each &:show
 	end
 
 	def update_buttons args
-		@buttons.each do |btn|
+		@buttons[:main].each do |btn|
 			if (btn.class == ControlSelectButton && btn.pid == args[:pid])
 				case @screen.playing_area.player(args[:pid]).class.to_s.to_sym
 				when :Player
@@ -118,10 +135,13 @@ class Menu
 	end
 
 	def button_down id
-		@buttons.each do |btn|
+		@buttons[:main].each do |btn|
 			if (btn.class == ControlSelectButton)
 				return  if (btn.button_down id)
 			end
+		end
+		@inputs[:settings].each do |input|
+			return    if (input.button_down id)
 		end
 		if (!$game_running && (id == Gosu::KB_SPACE || id == Gosu::KB_RETURN))
 			@screen.playing_area.start_game
@@ -129,13 +149,17 @@ class Menu
 	end
 
 	def click
-		@buttons.each &:click
-		@buttons_settings.each &:click
+		@buttons[:main].each &:click
+		@buttons[:settings].each &:click
+		@inputs[:main].each &:click
+		@inputs[:settings].each &:click
 	end
 
 	def update
-		@buttons.each &:update
-		@buttons_settings.each &:update
+		@buttons[:main].each &:update
+		@buttons[:settings].each &:update
+		@inputs[:main].each &:update
+		@inputs[:settings].each &:update
 	end
 
 	def draw
@@ -146,8 +170,10 @@ class Menu
 			@footer[:font].draw_rel text, @footer[:x],(@footer[:y] + 16 * count), 1, 0.5,0.5, 1,1, @footer[:color]
 		end
 		# Draw buttons
-		@buttons.each &:draw
-		@buttons_settings.each &:draw
+		@buttons[:main].each &:draw
+		@buttons[:settings].each &:draw
+		@inputs[:main].each &:draw
+		@inputs[:settings].each &:draw
 	end
 end
 

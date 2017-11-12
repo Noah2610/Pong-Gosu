@@ -1,6 +1,12 @@
 
 class Button
 	def initialize args
+		initialize_defaults args
+		initialize_button args
+		init args  if (defined? init)
+	end
+
+	def initialize_defaults args
 		@menu = args[:menu]
 		@x = args[:x] || (@menu.screen.playing_area.w / 2)
 		@y = args[:y] || (@menu.screen.playing_area.h / 2)
@@ -23,10 +29,12 @@ class Button
 		@color = @default_color
 		@border_width = 2
 		@font = Gosu::Font.new(args[:font_size] || 24)
-		@text = "BUTTON"
 		@last_in_collision = false
 		@show = false
-		init args  if (defined? init)
+	end
+
+	def initialize_button args
+		@text = "BUTTON"
 	end
 
 	def show
@@ -97,7 +105,7 @@ class ControlSelectButton < Button
 	def init args
 		@dir = args[:dir]
 		@pid = args[:pid]
-		@text = VALID_BUTTONS[@menu.screen.playing_area.player(@pid).controls[@dir][0]]
+		@text = btn_id_to_char(@menu.screen.playing_area.player(@pid).controls[@dir][0]).upcase
 		@@active = nil
 		@show = false  if (@menu.screen.playing_area.player(@pid).class == Cpu)
 	end
@@ -112,7 +120,7 @@ class ControlSelectButton < Button
 		if (@@active == self)
 			ret = @menu.screen.playing_area.set_control id: @pid, key: id, dir: @dir
 			if (ret)
-				@text = VALID_BUTTONS[ret]
+				@text = btn_id_to_char(ret).upcase
 				@@active = nil
 			end
 			return true
@@ -183,6 +191,75 @@ class ShowMainButton < Button
 
 	def click!
 		@menu.show_main
+	end
+end
+
+
+
+### Text Input Buttons ###
+class TextInput < Button
+	def initialize args
+		initialize_defaults args
+		initialize_input args
+		init args  if (defined? init)
+	end
+
+	def initialize_input args
+		@@active = nil
+		@text = "TEXT INPUT"
+	end
+
+	def button_down id
+		if (@@active == self)
+			case id
+			when Gosu::KB_RETURN
+				@@active = nil
+			when Gosu::KB_BACKSPACE
+				unless (@text.length == 0)
+					if (Gosu.button_down?(Gosu::KB_LEFT_SHIFT) || Gosu.button_down?(Gosu::KB_RIGHT_SHIFT))
+						@text = ""
+					else
+						@text[-1] = ""
+					end
+				end
+			else
+				if (Gosu.button_down?(Gosu::KB_LEFT_SHIFT) || Gosu.button_down?(Gosu::KB_RIGHT_SHIFT))
+					@text += Gosu.button_id_to_char(id).upcase
+				else
+					@text += Gosu.button_id_to_char(id)
+				end
+			end
+			return true
+		end
+		return false
+	end
+
+	def update
+		return  unless (@show)
+		# Check collision with mouse
+		in_collision = collision? $game.mouse_x, $game.mouse_y
+		if (@@active == self)
+			@color = @active_color
+		elsif (in_collision)
+			@color = @hover_color
+		else
+			@color = @default_color
+		end
+		@last_in_collision = in_collision
+	end
+
+	def click!
+		if (@@active != self)
+			@@active = self
+		elsif (@@active == self)
+			@@active = nil
+		end
+	end
+end
+
+class TestInput < TextInput
+	def init args
+		@text = "Test Input"
 	end
 end
 

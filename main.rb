@@ -47,18 +47,26 @@ BALL_SPEED_INCR = {
 	y: 1
 }
 
-valid_buttons = {}
-(4..29).to_a.each do |id|
-	valid_buttons[id] = nil
+
+def btn_id_to_char id
+	ret = Gosu.button_id_to_char(id).upcase
+	if (ret == "")
+		case id
+		when Gosu::KB_UP
+			ret = "/\\"
+		when Gosu::KB_DOWN
+			ret = "\\/"
+		when Gosu::KB_LEFT
+			ret = "<"
+		when Gosu::KB_RIGHT
+			ret = ">"
+		else
+			ret = "?"
+		end
+	end
+	return ret
 end
-("A".."Z").to_a.each_with_index do |btn,count|
-	valid_buttons[count + 4] = btn
-end
-valid_buttons[82] = "/\\"  # up
-valid_buttons[81] = "\\/"  # down
-valid_buttons[80] = "<"    # left
-valid_buttons[79] = ">"    # right
-VALID_BUTTONS = valid_buttons
+
 
 class Game < Gosu::Window
 	def initialize
@@ -69,7 +77,7 @@ class Game < Gosu::Window
 
 	def button_down id
 		case id
-		when Gosu::KB_Q
+		when Gosu::KB_ESCAPE
 			close
 		else
 			@screen.button_down id
