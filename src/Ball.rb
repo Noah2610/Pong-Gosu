@@ -10,8 +10,8 @@ class Ball
 		@y = args[:y]  if (!args[:y].nil?)
 		@size = 16
 		@color = Gosu::Color.argb 0xff_000000
-		@@speed_incr = BALL_SPEED_INCR
-		@@start_speed = BALL_START_SPEED
+		@@speed_incr = BALL_SPEED_INCR.dup
+		@@start_speed = BALL_START_SPEED.dup
 		@speed = @@start_speed.dup
 		@@timeout = 3
 		@delay = args[:delay].nil? ? @@timeout : args[:delay]
@@ -43,10 +43,10 @@ class Ball
 		case dir
 		when :left
 			@dir[:x] = -1
-			@dir[:y] = BALL_START_DIR[:y] * (rand(2) == 0 ? 1 : -1)
+			@dir[:y] = BALL_START_DIR[:y].dup * (rand(2) == 0 ? 1 : -1)
 		when :right
 			@dir[:x] = 1
-			@dir[:y] = BALL_START_DIR[:y] * (rand(2) == 0 ? 1 : -1)
+			@dir[:y] = BALL_START_DIR[:y].dup * (rand(2) == 0 ? 1 : -1)
 		end
 	end
 =end
@@ -67,14 +67,14 @@ class Ball
 			end
 
 			if    (((@x + x_offset) >= (p.x - p.size[:w] / 2) && (@x + x_offset) <= (p.x + p.size[:w] / 2)) &&
-				     ((@y + @size / 2) >= (p.y - p.size[:h] / 2) && @y < (p.y - p.size[:h] / 4)))
+					((@y + @size / 2) >= (p.y - p.size[:h] / 2) && @y < (p.y - p.size[:h] * p.segment_size)))
 				return {
 					target: :player,
 					pos: :top,
 					id: p.id
 				}
 			elsif (((@x + x_offset) >= (p.x - p.size[:w] / 2) && (@x + x_offset) <= (p.x + p.size[:w] / 2)) &&
-						 (@y > (p.y + p.size[:h] / 4) && (@y - @size / 2) <= (p.y + p.size[:h] / 2)))
+										(@y > (p.y + p.size[:h] * p.segment_size) && (@y - @size / 2) <= (p.y + p.size[:h] / 2)))
 				return {
 					target: :player,
 					pos: :bottom,

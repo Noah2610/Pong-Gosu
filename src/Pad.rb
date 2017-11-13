@@ -1,6 +1,6 @@
 
 class Pad
-	attr_reader :id, :x,:y, :size, :controls, :speed
+	attr_reader :id, :x,:y, :size, :controls, :speed, :segment_size
 	attr_accessor :score
 
 	def initialize args
@@ -8,10 +8,7 @@ class Pad
 		@playing_area = args[:playing_area]
 		@y = (@playing_area.h / 2)
 		@color = Gosu::Color.argb 0xff_000000
-		@size = {
-			w: 16,
-			h: 64
-		}
+		@size = PAD_SIZE.dup
 		@score = 0
 		case @id
 		when 0
@@ -22,9 +19,10 @@ class Pad
 			@x = 0
 		end
 
-		@controls = CONTROLS[@id]
-		@start_speed = PAD_SPEED
-		@speed = @start_speed
+		@controls = CONTROLS[@id].dup
+		@start_speed = PAD_SPEED.dup
+		@speed = @start_speed.dup
+		@segment_size = 1.0 / 4.0
 
 		init
 	end
@@ -40,6 +38,10 @@ class Pad
 	def set_speed speed
 		@start_speed = speed
 		@speed = @start_speed
+	end
+
+	def set_height height
+		@size[:h] = height
 	end
 
 	def update
@@ -77,8 +79,10 @@ class Pad
 		# Draw Pad
 		Gosu.draw_rect (@x - (@size[:w] / 2)), (@y - (@size[:h] / 2)), @size[:w], @size[:h], @color
 		# Draw debugging lines, Pad part separators (not dynamic, doesn't adjust to actual collision checking method)
-		#Gosu.draw_rect (@x - (@size[:w] / 2)), (@y - (@size[:h] / 4)), @size[:w], 2, Gosu::Color.argb(0xff_ff0000)
-		#Gosu.draw_rect (@x - (@size[:w] / 2)), (@y + (@size[:h] / 4)), @size[:w], 2, Gosu::Color.argb(0xff_ff0000)
+		if (@playing_area.screen.menu.page == :settings_pad)
+			Gosu.draw_rect (@x - (@size[:w] / 2)), (@y - (@size[:h] * @segment_size)), @size[:w], 2, Gosu::Color.argb(0xff_ff0000)
+			Gosu.draw_rect (@x - (@size[:w] / 2)), (@y + (@size[:h] * @segment_size)), @size[:w], 2, Gosu::Color.argb(0xff_ff0000)
+		end
 	end
 end
 

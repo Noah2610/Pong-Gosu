@@ -312,8 +312,11 @@ end
 ### SETTINGS BUTTONS/INPUTS ###
 
 ### GENERAL SETTINGS BUTTONS/INPUTS ###
+
+### PAD SETTINGS BUTTONS/INPUTS ###
 class PadSpeedInput < TextInput
 	def init args
+		@label = "Speed"
 		@pid = args[:pid] || :all
 		if (@pid == :all)
 			@text = PAD_SPEED.to_s
@@ -343,7 +346,37 @@ class PadSpeedInput < TextInput
 	end
 end
 
-### PAD SETTINGS BUTTONS/INPUTS ###
+class PadHeightInput < TextInput
+	def init args
+		@label = "Height"
+		@pid = args[:pid] || :all
+		if (@pid == :all)
+			@text = PAD_SIZE[:h].to_s
+		elsif (@pid.is_a? Integer)
+			@text = @menu.screen.playing_area.player(@pid).size[:h].to_s
+		end
+		@chars_whitelist = ("0".."9").to_a.concat([".",","])
+		@size = {
+			w: 64,
+			h: 32
+		}
+	end
+
+	def input_return
+		# set height of pad(s)
+		height = @text.gsub(",",".").to_f.round
+		if (@pid == :all)
+			[0,1].each { |i| @menu.screen.playing_area.player(i).set_height height }
+			@text = height.to_s
+		elsif (@pid.is_a? Integer)
+			@menu.screen.playing_area.player(@pid).set_height height
+		end
+	end
+
+	def custom_update
+		@text = @menu.screen.playing_area.player(@pid).size[:h].to_i.to_s  if (@@active != self && @pid.is_a?(Integer))
+	end
+end
 
 ### BALL SETTINGS BUTTONS/INPUTS ###
 

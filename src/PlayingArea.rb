@@ -1,8 +1,9 @@
 
 class PlayingArea
-	attr_reader :w, :h, :pads, :balls
+	attr_reader :w, :h, :pads, :balls, :screen
 
 	def initialize args
+		@screen = args[:screen]
 		@w = args[:w]
 		@h = args[:h]
 		@pads = [

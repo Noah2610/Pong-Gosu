@@ -1,6 +1,6 @@
 
 class Menu
-	attr_reader :screen
+	attr_reader :screen, :page
 	attr_accessor :has_clicked
 
 	def initialize args
@@ -117,27 +117,6 @@ class Menu
 					y:     ((@screen.playing_area.h / 4) * 3),
 					text:  "Back"
 				),
-				PadSpeedInput.new(
-					menu:  self,
-					x:     (@screen.playing_area.w / 2),
-					y:     (@screen.playing_area.h / 4 * 1.5),
-					label: "Pad speed",
-					pid:   :all
-				),
-				PadSpeedInput.new(
-					menu:  self,
-					x:     (@screen.playing_area.w / 4),
-					y:     (@screen.playing_area.h / 4 * 1.5),
-					label: "Pad 1 speed",
-					pid:   0
-				),
-				PadSpeedInput.new(
-					menu:  self,
-					x:     (@screen.playing_area.w / 4 * 3),
-					y:     (@screen.playing_area.h / 4 * 1.5),
-					label: "Pad 2 speed",
-					pid:   1
-				)
 			],
 
 			settings_ball: [
@@ -152,15 +131,57 @@ class Menu
 
 		@inputs = {
 			main: [],
-			settings: [
-=begin
-				TestInput.new(
-					menu: self,
-					x:    (@screen.playing_area.w / 2),
-					y:    (@screen.playing_area.h / 2)
-				)
-=end
-			]
+			settings: [],
+			settings_general: [],
+			settings_pad: [
+				# SPEED
+				# all Pads
+				PadSpeedInput.new(
+					menu:  self,
+					x:     (@screen.playing_area.w / 2),
+					y:     (@screen.playing_area.h / 4 * 1.5),
+					pid:   :all
+				),
+				# Pad id 0
+				PadSpeedInput.new(
+					menu:  self,
+					x:     (@screen.playing_area.w / 4),
+					y:     (@screen.playing_area.h / 4 * 1.5),
+					pid:   0
+				),
+				# Pad id 1
+				PadSpeedInput.new(
+					menu:  self,
+					x:     (@screen.playing_area.w / 4 * 3),
+					y:     (@screen.playing_area.h / 4 * 1.5),
+					pid:   1
+				),
+
+				# HEIGHT
+				# all Pads
+				PadHeightInput.new(
+					menu:  self,
+					x:     (@screen.playing_area.w / 2),
+					y:     (@screen.playing_area.h / 2),
+					pid:   :all
+				),
+				# Pad id 0
+				PadHeightInput.new(
+					menu:  self,
+					x:     (@screen.playing_area.w / 4),
+					y:     (@screen.playing_area.h / 2),
+					pid:   0
+				),
+				# Pad id 1
+				PadHeightInput.new(
+					menu:  self,
+					x:     (@screen.playing_area.w / 4 * 3),
+					y:     (@screen.playing_area.h / 2),
+					pid:   1
+				),
+
+			],
+			settings_ball: []
 		}
 
 		@title = {
@@ -174,7 +195,7 @@ class Menu
 			font:   Gosu::Font.new(64),
 			color:  Gosu::Color.argb(0xff_aa4444),
 			x:      (@screen.playing_area.w / 2),
-			y:      (@screen.playing_area.h / 6)
+			y:      (@screen.playing_area.h / 8)
 		}
 		@footer = {
 			text:   ["by Noah Rosenzweig", "2017"],
@@ -182,6 +203,35 @@ class Menu
 			color:  Gosu::Color.argb(0xff_cccccc),
 			x:      (@screen.playing_area.w / 2),
 			y:      (@screen.playing_area.h - 32)
+		}
+		@texts = {
+			main: [],
+			settings: [],
+			settings_general: [],
+			settings_ball: [],
+			settings_pad: [
+				{
+					text:  "All Pads",
+					font:  Gosu::Font.new(32),
+					color: Gosu::Color.argb(0xff_6644aa),
+					x:     (@screen.playing_area.w / 2),
+					y:     (@screen.playing_area.h / 4)
+				},
+				{
+					text:  "Pad 1",
+					font:  Gosu::Font.new(32),
+					color: Gosu::Color.argb(0xff_6644aa),
+					x:     (@screen.playing_area.w / 4),
+					y:     (@screen.playing_area.h / 4)
+				},
+				{
+					text:  "Pad 2",
+					font:  Gosu::Font.new(32),
+					color: Gosu::Color.argb(0xff_6644aa),
+					x:     (@screen.playing_area.w / 4 * 3),
+					y:     (@screen.playing_area.h / 4)
+				}
+			]
 		}
 
 		@page = :none
@@ -253,6 +303,10 @@ class Menu
 		# Draw footer
 		@footer[:text].each_with_index do |text,count|
 			@footer[:font].draw_rel text, @footer[:x],(@footer[:y] + 16 * count), 1, 0.5,0.5, 1,1, @footer[:color]
+		end
+		# Draw extra @texts
+		@texts[@page].each do |group|
+			group[:font].draw_rel group[:text], group[:x],group[:y], 1, 0.5,0.5, 1,1, group[:color]
 		end
 		# Draw buttons
 		[@buttons, @inputs].each do |group|

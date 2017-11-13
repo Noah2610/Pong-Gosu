@@ -3,8 +3,13 @@ class Cpu < Pad
 	attr_accessor :demo_movement
 	def init
 		@color = Gosu::Color.argb 0xff_444444
-		@@move_padding = @size[:h] / 3
+		@move_padding = @size[:h] / 3
 		@demo_movement = 0
+	end
+
+	def set_height height
+		@size[:h] = height
+		@move_padding = @size[:h] / 3
 	end
 
 	def find_ball
@@ -37,7 +42,7 @@ class Cpu < Pad
 		ball = find_ball
 		return  if ball.nil?
 		diff = ball.y - @y
-		return  if (diff.abs < @@move_padding)
+		return  if (diff.abs < @move_padding)
 		if    (diff < 0)
 			move :up
 		elsif (diff > 0)
