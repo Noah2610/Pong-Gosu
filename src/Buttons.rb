@@ -95,6 +95,8 @@ class Button
 		if (defined? @label)
 			@label_font.draw_rel @label, @x,(@y - (@size[:h] * 0.75)), 1, 0.5,0.5, 1,1, @label_color
 		end
+
+		custom_update  if (defined? custom_update)
 	end
 end
 
@@ -317,6 +319,10 @@ end
 class PadSpeedInput < TextInput
 	def init args
 		@label = "Speed"
+		@size = {
+			w: 64,
+			h: 32
+		}
 		@pid = args[:pid] || :all
 		if (@pid == :all)
 			@text = PAD_SPEED.to_s
@@ -324,10 +330,6 @@ class PadSpeedInput < TextInput
 			@text = @menu.screen.playing_area.player(@pid).speed.to_s
 		end
 		@chars_whitelist = ("0".."9").to_a.concat([".",","])
-		@size = {
-			w: 64,
-			h: 32
-		}
 	end
 
 	def input_return
@@ -349,6 +351,10 @@ end
 class PadHeightInput < TextInput
 	def init args
 		@label = "Height"
+		@size = {
+			w: 64,
+			h: 32
+		}
 		@pid = args[:pid] || :all
 		if (@pid == :all)
 			@text = PAD_SIZE[:h].to_s
@@ -356,10 +362,6 @@ class PadHeightInput < TextInput
 			@text = @menu.screen.playing_area.player(@pid).size[:h].to_s
 		end
 		@chars_whitelist = ("0".."9").to_a.concat([".",","])
-		@size = {
-			w: 64,
-			h: 32
-		}
 	end
 
 	def input_return
@@ -375,6 +377,48 @@ class PadHeightInput < TextInput
 
 	def custom_update
 		@text = @menu.screen.playing_area.player(@pid).size[:h].to_i.to_s  if (@@active != self && @pid.is_a?(Integer))
+	end
+end
+
+class PadSpeedIncrementInput < Button
+	def init args
+		@label = "Increment speed?"
+		@size = {
+			w: 64,
+			h: 32
+		}
+		@pid = args[:pid] || :all
+		if (@pid == :all)
+			@text = "YES"
+		elsif (@pid.is_a? Integer)
+			@text = @menu.screen.playing_area.player(@pid).speed_increment ? "YES" : "NO"
+		end
+	end
+
+	def click!
+		case @pid
+		when :all
+			case @text
+			when "YES"
+				[0,1].each { |i| @menu.screen.playing_area.player(i).set_speed_increment false }
+			when "NO"
+				[0,1].each { |i| @menu.screen.playing_area.player(i).set_speed_increment true }
+			end
+			@text = (@text == "YES") ? "NO" : (@text == "NO" ? "YES" : "-")
+		else
+			if (@pid.is_a? Integer)
+				case @text
+				when "YES"
+					@menu.screen.playing_area.player(@pid).set_speed_increment false
+				when "NO"
+					@menu.screen.playing_area.player(@pid).set_speed_increment true
+				end
+			end
+		end
+	end
+
+	def custom_update
+		@text = @menu.screen.playing_area.player(@pid).speed_increment ? "YES" : "NO"  if (@pid.is_a? Integer)
 	end
 end
 

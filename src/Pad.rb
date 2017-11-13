@@ -1,6 +1,6 @@
 
 class Pad
-	attr_reader :id, :x,:y, :size, :controls, :speed, :segment_size
+	attr_reader :id, :x,:y, :size, :controls, :speed, :segment_size, :speed_increment
 	attr_accessor :score
 
 	def initialize args
@@ -23,6 +23,7 @@ class Pad
 		@start_speed = PAD_SPEED.dup
 		@speed = @start_speed.dup
 		@segment_size = 1.0 / 4.0
+		@speed_increment = true
 
 		init
 	end
@@ -44,6 +45,10 @@ class Pad
 		@size[:h] = height
 	end
 
+	def set_speed_increment state
+		@speed_increment = !!state
+	end
+
 	def update
 		# Player controls
 		@controls.each do |k,v|
@@ -54,11 +59,13 @@ class Pad
 	end
 
 	def move id
-		speed_incr = 0
-		@playing_area.balls.each do |ball|
-			speed_incr = ball.speed[:y].floor - 1  if (ball.speed[:y].floor - 1 > speed_incr)
+		if (@speed_increment)
+			speed_incr = 0
+			@playing_area.balls.each do |ball|
+				speed_incr = ball.speed[:y].floor - 1  if (ball.speed[:y].floor - 1 > speed_incr)
+			end
+			@speed = @start_speed + speed_incr
 		end
-		@speed = @start_speed + speed_incr
 		dir = 0
 		case id
 		when :up

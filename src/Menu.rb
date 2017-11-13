@@ -117,6 +117,28 @@ class Menu
 					y:     ((@screen.playing_area.h / 4) * 3),
 					text:  "Back"
 				),
+				# TOGGLE PAD SPEED INCREMENTATION
+				# all Pads
+				PadSpeedIncrementInput.new(
+					menu:  self,
+					x:     (@screen.playing_area.w / 2),
+					y:     ((@screen.playing_area.h / 4) * 2.5),
+					pid:   :all
+				),
+				# Pad id 0
+				PadSpeedIncrementInput.new(
+					menu:  self,
+					x:     (@screen.playing_area.w / 4),
+					y:     ((@screen.playing_area.h / 4) * 2.5),
+					pid:   0
+				),
+				# Pad id 1
+				PadSpeedIncrementInput.new(
+					menu:  self,
+					x:     (@screen.playing_area.w / 4 * 3),
+					y:     ((@screen.playing_area.h / 4) * 2.5),
+					pid:   1
+				),
 			],
 
 			settings_ball: [
