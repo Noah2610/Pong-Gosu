@@ -42,6 +42,29 @@ class PlayingArea
 		return nil
 	end
 
+	def cpus_demo_move pattern
+		cpus = []
+		@pads.each do |p|
+			cpus << p  if (p.is_a? Cpu)
+		end
+		case pattern
+		when :up_down
+			cpus.each do |cpu|
+				case cpu.demo_movement
+				when 0
+					cpu.demo_movement = rand(2) == 0 ? -1 : 1
+				when -1
+					ret = cpu.move :up
+				when 1
+					ret = cpu.move :down
+				end
+				if (ret == :border_collision)
+					cpu.demo_movement *= -1
+				end
+			end
+		end
+	end
+
 	def new_ball
 		highest = {}
 		@pads.each do |p|

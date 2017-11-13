@@ -19,12 +19,14 @@ class Panel
 		# Draw background
 		Gosu.draw_rect @x,@y, @w,@h, @@bgcolor
 		# Draw Pad scores
-		@pads.each do |p|
-			case p.id
-			when 0
-				@@font.draw_rel p.score, (@x + 42),(@y + @h / 2), 1, 0.5,0.5, 1,1, @@txtcolor
-			when 1
-				@@font.draw_rel p.score, (@w - 42),(@y + @h / 2), 1, 0.5,0.5, 1,1, @@txtcolor
+		if ($game_running)
+			@pads.each do |p|
+				case p.id
+				when 0
+					@@font.draw_rel p.score, (@x + 42),(@y + @h / 2), 1, 0.5,0.5, 1,1, @@txtcolor
+				when 1
+					@@font.draw_rel p.score, (@w - 42),(@y + @h / 2), 1, 0.5,0.5, 1,1, @@txtcolor
+				end
 			end
 		end
 

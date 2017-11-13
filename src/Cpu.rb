@@ -1,8 +1,10 @@
 
 class Cpu < Pad
+	attr_accessor :demo_movement
 	def init
 		@color = Gosu::Color.argb 0xff_444444
 		@@move_padding = @size[:h] / 3
+		@demo_movement = 0
 	end
 
 	def find_ball

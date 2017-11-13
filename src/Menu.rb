@@ -14,6 +14,12 @@ class Menu
 					x:     (@screen.playing_area.w / 2),
 					y:     (@screen.playing_area.h / 2)
 				),
+				CloseButton.new(
+					menu:  self,
+					x:     (@screen.w - 32),
+					y:     32,
+					size:  { w: 32, h: 32 }
+				),
 				# Set Player control buttons
 				ControlSelectButton.new(
 					menu:  self,
@@ -74,6 +80,72 @@ class Menu
 					menu:  self,
 					x:     (@screen.playing_area.w / 2),
 					y:     ((@screen.playing_area.h / 4) * 3)
+				),
+				ShowGeneralSettingsButton.new(
+					menu:  self,
+					x:     (@screen.playing_area.w / 2),
+					y:     (@screen.playing_area.h / 4 * 1.5),
+					size:  { w: 192, h: 42 }
+				),
+				ShowPadSettingsButton.new(
+					menu:  self,
+					x:     (@screen.playing_area.w / 2),
+					y:     (@screen.playing_area.h / 2),
+					size:  { w: 192, h: 42 }
+				),
+				ShowBallSettingsButton.new(
+					menu:  self,
+					x:     (@screen.playing_area.w / 2),
+					y:     (@screen.playing_area.h / 4 * 2.5),
+					size:  { w: 192, h: 42 }
+				)
+			],
+
+			settings_general: [
+				ShowSettingsButton.new(
+					menu:  self,
+					x:     (@screen.playing_area.w / 2),
+					y:     ((@screen.playing_area.h / 4) * 3),
+					text:  "Back"
+				)
+			],
+
+			settings_pad: [
+				ShowSettingsButton.new(
+					menu:  self,
+					x:     (@screen.playing_area.w / 2),
+					y:     ((@screen.playing_area.h / 4) * 3),
+					text:  "Back"
+				),
+				PadSpeedInput.new(
+					menu:  self,
+					x:     (@screen.playing_area.w / 2),
+					y:     (@screen.playing_area.h / 4 * 1.5),
+					label: "Pad speed",
+					pid:   :all
+				),
+				PadSpeedInput.new(
+					menu:  self,
+					x:     (@screen.playing_area.w / 4),
+					y:     (@screen.playing_area.h / 4 * 1.5),
+					label: "Pad 1 speed",
+					pid:   0
+				),
+				PadSpeedInput.new(
+					menu:  self,
+					x:     (@screen.playing_area.w / 4 * 3),
+					y:     (@screen.playing_area.h / 4 * 1.5),
+					label: "Pad 2 speed",
+					pid:   1
+				)
+			],
+
+			settings_ball: [
+				ShowSettingsButton.new(
+					menu:  self,
+					x:     (@screen.playing_area.w / 2),
+					y:     ((@screen.playing_area.h / 4) * 3),
+					text:  "Back"
 				)
 			]
 		}
@@ -81,20 +153,28 @@ class Menu
 		@inputs = {
 			main: [],
 			settings: [
+=begin
 				TestInput.new(
 					menu: self,
 					x:    (@screen.playing_area.w / 2),
 					y:    (@screen.playing_area.h / 2)
 				)
+=end
 			]
 		}
 
 		@title = {
-			text:   "Pong!",
+			text:   {
+				main:              "Pong!",
+				settings:          "Settings",
+				settings_general:  "General Settings",
+				settings_pad:      "Pad Settings",
+				settings_ball:     "Ball Settings"
+			},
 			font:   Gosu::Font.new(64),
-			color:  Gosu::Color.argb(0xff_ff0000),
+			color:  Gosu::Color.argb(0xff_aa4444),
 			x:      (@screen.playing_area.w / 2),
-			y:      64
+			y:      (@screen.playing_area.h / 6)
 		}
 		@footer = {
 			text:   ["by Noah Rosenzweig", "2017"],
@@ -104,21 +184,22 @@ class Menu
 			y:      (@screen.playing_area.h - 32)
 		}
 
-		show_main
+		@page = :none
+
+		show :main
 	end
 
-	def show_main
-		@buttons[:settings].each &:hide
-		@buttons[:main].each &:show
-		@inputs[:settings].each &:hide
-		@inputs[:main].each &:show
-	end
-
-	def show_settings
-		@buttons[:main].each &:hide
-		@buttons[:settings].each &:show
-		@inputs[:main].each &:hide
-		@inputs[:settings].each &:show
+	def show page
+		@page = page
+		[@buttons, @inputs].each do |group|
+			group.each do |k,v|
+				if (k != page)
+					group[k].each &:hide
+				elsif (k == page)
+					group[k].each &:show
+				end
+			end
+		end
 	end
 
 	def update_buttons args
@@ -135,13 +216,12 @@ class Menu
 	end
 
 	def button_down id
-		@buttons[:main].each do |btn|
-			if (btn.class == ControlSelectButton)
-				return  if (btn.button_down id)
+		[@buttons, @inputs].each do |group|
+			group.each do |k,v|
+				group[k].each do |inst|
+					return  if (inst.button_down(id))
+				end
 			end
-		end
-		@inputs[:settings].each do |input|
-			return    if (input.button_down id)
 		end
 		if (!$game_running && (id == Gosu::KB_SPACE || id == Gosu::KB_RETURN))
 			@screen.playing_area.start_game
@@ -149,31 +229,37 @@ class Menu
 	end
 
 	def click
-		@buttons[:main].each &:click
-		@buttons[:settings].each &:click
-		@inputs[:main].each &:click
-		@inputs[:settings].each &:click
+		[@buttons, @inputs].each do |group|
+			group.each do |k,v|
+				group[k].each &:click
+			end
+		end
 	end
 
 	def update
-		@buttons[:main].each &:update
-		@buttons[:settings].each &:update
-		@inputs[:main].each &:update
-		@inputs[:settings].each &:update
+		[@buttons, @inputs].each do |group|
+			group.each do |k,v|
+				group[k].each &:update
+			end
+		end
+
+		# Move CPUs as demonstration for :settings_pad page
+		@screen.playing_area.cpus_demo_move :up_down  if (@page == :settings_pad)
 	end
 
 	def draw
 		# Draw title
-		@title[:font].draw_rel @title[:text], @title[:x],@title[:y], 1, 0.5,0.5, 1,1, @title[:color]
+		@title[:font].draw_rel @title[:text][@page], @title[:x],@title[:y], 1, 0.5,0.5, 1,1, @title[:color]
 		# Draw footer
 		@footer[:text].each_with_index do |text,count|
 			@footer[:font].draw_rel text, @footer[:x],(@footer[:y] + 16 * count), 1, 0.5,0.5, 1,1, @footer[:color]
 		end
 		# Draw buttons
-		@buttons[:main].each &:draw
-		@buttons[:settings].each &:draw
-		@inputs[:main].each &:draw
-		@inputs[:settings].each &:draw
+		[@buttons, @inputs].each do |group|
+			group.each do |k,v|
+				group[k].each &:draw
+			end
+		end
 	end
 end
 

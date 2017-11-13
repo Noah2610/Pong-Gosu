@@ -26,9 +26,11 @@ class Button
 			fg:     Gosu::Color.argb(0xff_cccccc),
 			border: Gosu::Color.argb(0xff_000000)
 		}
+		@label_color = Gosu::Color.argb(0xff_4444aa)
 		@color = @default_color
 		@border_width = 2
 		@font = Gosu::Font.new(args[:font_size] || 24)
+		@label_font = Gosu::Font.new(args[:font_label_size] || 24)
 		@last_in_collision = false
 		@show = false
 	end
@@ -42,6 +44,10 @@ class Button
 	end
 	def hide
 		@show = false
+	end
+
+	def button_down *args
+		false
 	end
 
 	def collision? x, y
@@ -85,6 +91,10 @@ class Button
 		Gosu.draw_rect (x + @border_width),(y + @border_width), (@size[:w] - @border_width * 2),(@size[:h] - @border_width * 2), @color[:bg]
 		# Draw text
 		@font.draw_rel @text, @x,@y, 1, 0.5,0.5, 1,1, @color[:fg]
+		# Draw label (for TextInput)
+		if (defined? @label)
+			@label_font.draw_rel @label, @x,(@y - (@size[:h] * 0.75)), 1, 0.5,0.5, 1,1, @label_color
+		end
 	end
 end
 
@@ -93,9 +103,17 @@ class StartButton < Button
 	def init args
 		@text = "Start!"
 	end
-
 	def click!
 		@menu.screen.playing_area.start_game
+	end
+end
+
+class CloseButton < Button
+	def init args
+		@text = "X"
+	end
+	def click!
+		$game.close
 	end
 end
 
@@ -174,29 +192,53 @@ end
 
 class ShowSettingsButton < Button
 	def init args
-		@text = "Settings"
+		@text = args[:text] || "Settings"
 	end
 
 	def click!
-		@menu.show_settings
+		@menu.show :settings
 	end
 end
-
-
 
 class ShowMainButton < Button
 	def init args
-		@text = "Back"
+		@text = args[:text] || "Back"
 	end
-
 	def click!
-		@menu.show_main
+		@menu.show :main
+	end
+end
+
+class ShowGeneralSettingsButton < Button
+	def init args
+		@text = args[:text] || "General settings"
+	end
+	def click!
+		@menu.show :settings_general
+	end
+end
+
+class ShowPadSettingsButton < Button
+	def init args
+		@text = args[:text] || "Pad settings"
+	end
+	def click!
+		@menu.show :settings_pad
+	end
+end
+
+class ShowBallSettingsButton < Button
+	def init args
+		@text = args[:text] || "Ball setting"
+	end
+	def click!
+		@menu.show :settings_ball
 	end
 end
 
 
 
-### Text Input Buttons ###
+### TEXT INPUT CLASS ###
 class TextInput < Button
 	def initialize args
 		initialize_defaults args
@@ -207,6 +249,9 @@ class TextInput < Button
 	def initialize_input args
 		@@active = nil
 		@text = "TEXT INPUT"
+		@label = args[:label] || nil
+		@chars_whitelist = []
+		@chars_blacklist = []
 	end
 
 	def button_down id
@@ -214,6 +259,7 @@ class TextInput < Button
 			case id
 			when Gosu::KB_RETURN
 				@@active = nil
+				input_return  if (defined? input_return)
 			when Gosu::KB_BACKSPACE
 				unless (@text.length == 0)
 					if (Gosu.button_down?(Gosu::KB_LEFT_SHIFT) || Gosu.button_down?(Gosu::KB_RIGHT_SHIFT))
@@ -223,10 +269,13 @@ class TextInput < Button
 					end
 				end
 			else
-				if (Gosu.button_down?(Gosu::KB_LEFT_SHIFT) || Gosu.button_down?(Gosu::KB_RIGHT_SHIFT))
-					@text += Gosu.button_id_to_char(id).upcase
-				else
-					@text += Gosu.button_id_to_char(id)
+				key = Gosu.button_id_to_char(id)
+				if ((@chars_whitelist.empty? || @chars_whitelist.include?(key)) && !@chars_blacklist.include?(key))
+					if (Gosu.button_down?(Gosu::KB_LEFT_SHIFT) || Gosu.button_down?(Gosu::KB_RIGHT_SHIFT))
+						@text += key.upcase
+					else
+						@text += key
+					end
 				end
 			end
 			return true
@@ -246,6 +295,8 @@ class TextInput < Button
 			@color = @default_color
 		end
 		@last_in_collision = in_collision
+
+		custom_update  if (defined? custom_update)
 	end
 
 	def click!
@@ -257,9 +308,43 @@ class TextInput < Button
 	end
 end
 
-class TestInput < TextInput
+
+### SETTINGS BUTTONS/INPUTS ###
+
+### GENERAL SETTINGS BUTTONS/INPUTS ###
+class PadSpeedInput < TextInput
 	def init args
-		@text = "Test Input"
+		@pid = args[:pid] || :all
+		if (@pid == :all)
+			@text = PAD_SPEED.to_s
+		elsif (@pid.is_a? Integer)
+			@text = @menu.screen.playing_area.player(@pid).speed.to_s
+		end
+		@chars_whitelist = ("0".."9").to_a.concat([".",","])
+		@size = {
+			w: 64,
+			h: 32
+		}
+	end
+
+	def input_return
+		# set speed of pad(s)
+		speed = @text.gsub(",",".").to_f.round
+		if (@pid == :all)
+			[0,1].each { |i| @menu.screen.playing_area.player(i).set_start_speed speed }
+			@text = speed.to_s
+		elsif (@pid.is_a? Integer)
+			@menu.screen.playing_area.player(@pid).set_start_speed speed
+		end
+	end
+
+	def custom_update
+		@text = @menu.screen.playing_area.player(@pid).speed.to_i.to_s  if (@@active != self && @pid.is_a?(Integer))
 	end
 end
+
+### PAD SETTINGS BUTTONS/INPUTS ###
+
+### BALL SETTINGS BUTTONS/INPUTS ###
+
 

@@ -1,6 +1,6 @@
 
 class Pad
-	attr_reader :id, :x,:y, :size, :controls
+	attr_reader :id, :x,:y, :size, :controls, :speed
 	attr_accessor :score
 
 	def initialize args
@@ -23,14 +23,25 @@ class Pad
 		end
 
 		@controls = CONTROLS[@id]
-		@@speed = 4
-		@speed = @@speed
+		@start_speed = PAD_SPEED
+		@speed = @start_speed
 
 		init
 	end
 
 	def init
 	end
+
+	def set_start_speed speed
+		@start_speed = speed.to_f
+		@speed = @start_speed
+	end
+
+	def set_speed speed
+		@start_speed = speed
+		@speed = @start_speed
+	end
+
 	def update
 		# Player controls
 		@controls.each do |k,v|
@@ -45,7 +56,7 @@ class Pad
 		@playing_area.balls.each do |ball|
 			speed_incr = ball.speed[:y].floor - 1  if (ball.speed[:y].floor - 1 > speed_incr)
 		end
-		@speed = @@speed + speed_incr
+		@speed = @start_speed + speed_incr
 		dir = 0
 		case id
 		when :up
@@ -55,6 +66,7 @@ class Pad
 		else
 			return
 		end
+		return :border_collision  if (dir == 0)
 
 		@speed.floor.times do |n|
 			@y += dir

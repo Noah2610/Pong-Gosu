@@ -47,6 +47,8 @@ BALL_SPEED_INCR = {
 	y: 1
 }
 
+PAD_SPEED = 4
+
 
 def btn_id_to_char id
 	ret = Gosu.button_id_to_char(id).upcase
