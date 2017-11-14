@@ -155,6 +155,8 @@ class Menu
 			main: [],
 			settings: [],
 			settings_general: [],
+
+			# PAD SETTINGS
 			settings_pad: [
 				# SPEED
 				# all Pads
@@ -203,7 +205,53 @@ class Menu
 				),
 
 			],
-			settings_ball: []
+
+			# BALL SETTINGS
+			settings_ball: [
+				# Ball Spawn Delay
+				BallDelayInput.new(
+					menu:  self,
+					x:     (@screen.playing_area.w / 3),
+					y:     (@screen.playing_area.h / 4)
+				),
+				# Ball Starting Direction y
+				BallStartDirYButton.new(
+					menu:  self,
+					x:     (@screen.playing_area.w / 3),
+					y:     (@screen.playing_area.h / 4 * 1.5),
+					dir:   -1
+				),
+				BallStartDirYButton.new(
+					menu:  self,
+					x:     (@screen.playing_area.w / 3 - 16),
+					y:     (@screen.playing_area.h / 4 * 1.75),
+					dir:   0
+				),
+				BallStartDirYButton.new(
+					menu:  self,
+					x:     (@screen.playing_area.w / 3 + 16),
+					y:     (@screen.playing_area.h / 4 * 1.75),
+					dir:   :random
+				),
+				BallStartDirYButton.new(
+					menu:  self,
+					x:     (@screen.playing_area.w / 3),
+					y:     (@screen.playing_area.h / 2),
+					dir:   1
+				),
+				# Ball Starting Speed
+				BallStartSpeedInput.new(
+					menu:  self,
+					x:     (@screen.playing_area.w / 3 * 2),
+					y:     (@screen.playing_area.h / 4)
+				),
+				# Ball Speed Incrementation
+				BallSpeedIncrementInput.new(
+					menu:  self,
+					x:     (@screen.playing_area.w / 3 * 2),
+					y:     (@screen.playing_area.h / 4 * 1.5)
+				),
+			]
 		}
 
 		@title = {
@@ -272,6 +320,17 @@ class Menu
 				end
 			end
 		end
+		if (page == :settings_ball)
+			@screen.playing_area.demo_game = true
+			ball_reset
+		else
+			@screen.playing_area.demo_game = false
+			@screen.playing_area.goal
+		end
+	end
+
+	def ball_reset
+		@screen.playing_area.goal
 	end
 
 	def update_buttons args

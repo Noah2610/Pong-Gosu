@@ -1,6 +1,7 @@
 
 class PlayingArea
 	attr_reader :w, :h, :pads, :balls, :screen
+	attr_accessor :demo_game
 
 	def initialize args
 		@screen = args[:screen]
@@ -10,10 +11,11 @@ class PlayingArea
 			Player.new(id: 0, playing_area: self),
 			Cpu.new(id: 1, playing_area: self)
 		]
-		@ball_delay = 3
 		@balls = []
-		@new_ball_delay_sec = 20 + @ball_delay
+		@new_ball_delay_sec = 20 + $ball_delay.dup
 		@new_ball_at = nil
+		@multiple_balls = false
+		@demo_game = false
 	end
 
 	def set_pad args
@@ -81,11 +83,11 @@ class PlayingArea
 			end
 		end
 
-		@balls << Ball.new(playing_area: self, side: highest[:side], delay: @ball_delay)
+		@balls << Ball.new(playing_area: self, side: highest[:side], delay: $ball_delay.dup)
 	end
 
 	def handle_new_ball
-		return
+		return  if (!@multiple_balls || !$game_running)
 		if (!@new_ball_at.nil? && @new_ball_at < Time.now)
 			new_ball  unless (@new_ball_at.nil?)
 			@new_ball_at = Time.now + @new_ball_delay_sec
@@ -94,31 +96,29 @@ class PlayingArea
 
 	def reset side = :right
 		@balls.clear
-		@balls << Ball.new(playing_area: self, side: side, delay: @ball_delay)
+		@balls << Ball.new(playing_area: self, side: side, delay: $ball_delay.dup)
 		@new_ball_at = Time.now + @new_ball_delay_sec
 	end
 
-	def goal side
+	def goal side = ((rand(2) == 0) ? :left : :right)
+		unless ($game_running)
+			@balls.clear
+			@balls << Ball.new(playing_area: self, side: side, delay: $ball_delay.dup)  if (@demo_game)
+			return
+		end
 		case side
 		when :left
 			reset :right
-			@pads.each do |p|
-				if (p.id == 1)
-					p.score += 1
-				end
-			end
+			player(1).score += 1
 		when :right
 			reset :left
-			@pads.each do |p|
-				if (p.id == 0)
-					p.score += 1
-				end
-			end
+			player(0).score += 1
 		end
 	end
 
 	def start_game
 		$game_running = true
+		@balls.clear
 		new_ball
 	end
 
@@ -139,10 +139,8 @@ class PlayingArea
 
 	def update
 		@pads.each &:update
-		if ($game_running)
-			handle_new_ball
-			@balls.each &:update
-		end
+		handle_new_ball
+		@balls.each &:update
 	end
 
 	def draw
@@ -154,7 +152,7 @@ class PlayingArea
 		@pads.each &:draw
 
 		# Draw Ball(s)
-		@balls.each &:draw  if ($game_running)
+		@balls.each &:draw  if ($game_running || @demo_game)
 	end
 end
 

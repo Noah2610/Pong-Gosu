@@ -423,5 +423,106 @@ class PadSpeedIncrementInput < Button
 end
 
 ### BALL SETTINGS BUTTONS/INPUTS ###
+class BallDelayInput < TextInput
+	def init args
+		@label = "Spawn delay"
+		@size = {
+			w: 64,
+			h: 32
+		}
+		@text = $ball_delay.to_s
+		@chars_whitelist = ("0".."9").to_a.concat([".",","])
+	end
 
+	def input_return
+		$ball_delay = @text.to_f
+		@text = $ball_delay.to_s
+		@menu.ball_reset
+	end
+end
+
+class BallStartSpeedInput < TextInput
+	def init args
+		@label = "Starting speed"
+		@size = {
+			w: 64,
+			h: 32
+		}
+		@text = $ball_start_speed[:x].to_s
+		@chars_whitelist = ("0".."9").to_a.concat([".",","])
+	end
+
+	def input_return
+		$ball_start_speed[:x] = @text.to_f.round.to_i
+		@text = $ball_start_speed[:x].to_s
+		@menu.ball_reset
+	end
+end
+
+class BallSpeedIncrementInput < TextInput
+	def init args
+		@label = "Speed incrementation"
+		@size = {
+			w: 64,
+			h: 32
+		}
+		@text = $ball_speed_incr[:x].to_s
+		@chars_whitelist = ("0".."9").to_a.concat([".",","])
+	end
+
+	def input_return
+		$ball_speed_incr[:x] = @text.to_f
+		@text = $ball_speed_incr[:x].to_s
+		@menu.ball_reset
+	end
+end
+
+class BallStartDirYButton < Button
+	def init args
+		@dir = args[:dir]
+		case @dir
+		when :random
+			@text = "R"
+		when 0
+			@text = "-"
+		when -1
+			@text = "/\\"
+			@label = "Starting Direction (y)"
+		when 1
+			@text = "\\/"
+		end
+		@size = {
+			w: 32,
+			h: 32
+		}
+		@@active = self  if (@dir == $ball_start_dir[:y])
+	end
+
+	def click!
+		if (@@active != self)
+			@@active = self
+			$ball_start_dir[:y] = @dir
+			unless (@dir == 0)
+				$ball_start_speed[:y] = $ball_speed_incr[:y]
+			else
+				$ball_start_speed[:y] = 0
+			end
+			@menu.ball_reset
+		end
+	end
+
+	def update
+		if (@show)
+			in_collision = collision? $game.mouse_x, $game.mouse_y
+			if (@@active == self)
+				@color = @active_color
+			elsif (in_collision)
+				@color = @hover_color
+			else
+				@color = @default_color
+			end
+			@last_in_collision = in_collision
+		end
+	end
+end
 
