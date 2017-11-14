@@ -107,6 +107,12 @@ class Menu
 					x:     (@screen.playing_area.w / 2),
 					y:     ((@screen.playing_area.h / 4) * 3),
 					text:  "Back"
+				),
+				# Toggle multiple balls button
+				ToggleMultipleBallsButton.new(
+					menu:  self,
+					x:     (@screen.playing_area.w / 3),
+					y:     (@screen.playing_area.h / 4 * 1.25)
 				)
 			],
 
@@ -154,7 +160,14 @@ class Menu
 		@inputs = {
 			main: [],
 			settings: [],
-			settings_general: [],
+			settings_general: [
+				# Mulitple balls delay
+				MultipleBallsDelayInput.new(
+					menu:  self,
+					x:     (@screen.playing_area.w / 3 * 2),
+					y:     (@screen.playing_area.h / 4 * 1.25)
+				)
+			],
 
 			# PAD SETTINGS
 			settings_pad: [

@@ -27,7 +27,6 @@ DEFAULT_CONTROLS = [
 		down:  [Gosu::KB_DOWN, Gosu::KB_J]
 	}
 ]
-
 CONTROLS = DEFAULT_CONTROLS
 
 PAUSE_BUTTON = [Gosu::KB_P, Gosu::KB_ESCAPE]
@@ -36,12 +35,10 @@ $ball_start_speed = {
 	x: 4,
 	y: 0
 }
-
 $ball_start_dir = {
 	x: 1,
 	y: 0
 }
-
 $ball_speed_incr = {
 	x: 0.5,
 	y: 1
@@ -49,8 +46,10 @@ $ball_speed_incr = {
 
 $ball_delay = 3.0
 
-PAD_SPEED = 4
+$multiple_balls = false
+$multiple_balls_delay = 20.0
 
+PAD_SPEED = 4
 PAD_SIZE = {
 	w: 16,
 	h: 64

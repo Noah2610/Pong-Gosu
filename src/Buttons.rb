@@ -202,43 +202,6 @@ class ShowSettingsButton < Button
 	end
 end
 
-class ShowMainButton < Button
-	def init args
-		@text = args[:text] || "Back"
-	end
-	def click!
-		@menu.show :main
-	end
-end
-
-class ShowGeneralSettingsButton < Button
-	def init args
-		@text = args[:text] || "General settings"
-	end
-	def click!
-		@menu.show :settings_general
-	end
-end
-
-class ShowPadSettingsButton < Button
-	def init args
-		@text = args[:text] || "Pad settings"
-	end
-	def click!
-		@menu.show :settings_pad
-	end
-end
-
-class ShowBallSettingsButton < Button
-	def init args
-		@text = args[:text] || "Ball setting"
-	end
-	def click!
-		@menu.show :settings_ball
-	end
-end
-
-
 
 ### TEXT INPUT CLASS ###
 class TextInput < Button
@@ -312,8 +275,81 @@ end
 
 
 ### SETTINGS BUTTONS/INPUTS ###
+class ShowMainButton < Button
+	def init args
+		@text = args[:text] || "Back"
+	end
+	def click!
+		@menu.show :main
+	end
+end
+
+class ShowGeneralSettingsButton < Button
+	def init args
+		@text = args[:text] || "General settings"
+	end
+	def click!
+		@menu.show :settings_general
+	end
+end
+
+class ShowPadSettingsButton < Button
+	def init args
+		@text = args[:text] || "Pad settings"
+	end
+	def click!
+		@menu.show :settings_pad
+	end
+end
+
+class ShowBallSettingsButton < Button
+	def init args
+		@text = args[:text] || "Ball setting"
+	end
+	def click!
+		@menu.show :settings_ball
+	end
+end
 
 ### GENERAL SETTINGS BUTTONS/INPUTS ###
+class ToggleMultipleBallsButton < Button
+	def init args
+		@label = "Multiple balls?"
+		@size = {
+			w: 64,
+			h: 32
+		}
+		@text = ($multiple_balls ? "YES" : "NO")
+	end
+
+	def click!
+		case $multiple_balls
+		when true
+			$multiple_balls = false
+		when false
+			$multiple_balls = true
+		end
+		@text = ($multiple_balls ? "YES" : "NO")
+	end
+end
+
+class MultipleBallsDelayInput < TextInput
+	def init args
+		@label = "Multiple balls delay"
+		@size = {
+			w: 64,
+			h: 32
+		}
+		@text = $multiple_balls_delay.to_s
+		@chars_whitelist = ("0".."9").to_a.concat([",","."])
+	end
+
+	def input_return
+		delay = @text.gsub(",",".").to_f
+		$multiple_balls_delay = delay
+		@text = $multiple_balls_delay.to_s
+	end
+end
 
 ### PAD SETTINGS BUTTONS/INPUTS ###
 class PadSpeedInput < TextInput

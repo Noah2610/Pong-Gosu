@@ -12,9 +12,8 @@ class PlayingArea
 			Cpu.new(id: 1, playing_area: self)
 		]
 		@balls = []
-		@new_ball_delay_sec = 20 + $ball_delay.dup
+		@new_ball_delay_sec = $multiple_balls_delay + $ball_delay.dup
 		@new_ball_at = nil
-		@multiple_balls = false
 		@demo_game = false
 	end
 
@@ -87,7 +86,7 @@ class PlayingArea
 	end
 
 	def handle_new_ball
-		return  if (!@multiple_balls || !$game_running)
+		return  if (!$multiple_balls || !$game_running)
 		if (!@new_ball_at.nil? && @new_ball_at < Time.now)
 			new_ball  unless (@new_ball_at.nil?)
 			@new_ball_at = Time.now + @new_ball_delay_sec
