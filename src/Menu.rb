@@ -112,7 +112,7 @@ class Menu
 				ToggleMultipleBallsButton.new(
 					menu:  self,
 					x:     (@screen.playing_area.w / 3),
-					y:     (@screen.playing_area.h / 4 * 1.25)
+					y:     (@screen.playing_area.h / 2 * 1.1)
 				)
 			],
 
@@ -160,12 +160,26 @@ class Menu
 		@inputs = {
 			main: [],
 			settings: [],
+			# GENERAL SETTINGS
 			settings_general: [
+				# Screen resolution
+				SetScreenResolutionInput.new(
+					menu:  self,
+					x:     (@screen.playing_area.w / 2 * 0.85),
+					y:     (@screen.playing_area.h / 4 * 1.5),
+					axis:  :x
+				),
+				SetScreenResolutionInput.new(
+					menu:  self,
+					x:     (@screen.playing_area.w / 2 * 1.15),
+					y:     (@screen.playing_area.h / 4 * 1.5),
+					axis:  :y
+				),
 				# Mulitple balls delay
 				MultipleBallsDelayInput.new(
 					menu:  self,
 					x:     (@screen.playing_area.w / 3 * 2),
-					y:     (@screen.playing_area.h / 4 * 1.25)
+					y:     (@screen.playing_area.h / 2 * 1.1)
 				)
 			],
 
@@ -290,7 +304,22 @@ class Menu
 		@texts = {
 			main: [],
 			settings: [],
-			settings_general: [],
+			settings_general: [
+				{
+					text:  "Screen Resolution (Work In Progress)",
+					font:  Gosu::Font.new(32),
+					color: Gosu::Color.argb(0xff_6644aa),
+					x:     (@screen.playing_area.w / 2),
+					y:     (@screen.playing_area.h / 4)
+				},
+				{
+					text:  "x",
+					font:  Gosu::Font.new(24),
+					color: Gosu::Color.argb(0xff_000000),
+					x:     (@screen.playing_area.w / 2),
+					y:     (@screen.playing_area.h / 4 * 1.5)
+				}
+			],
 			settings_ball: [],
 			settings_pad: [
 				{

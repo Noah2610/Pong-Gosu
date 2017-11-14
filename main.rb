@@ -1,3 +1,4 @@
+#!/bin/env ruby
 
 require 'gosu'
 require 'byebug'

@@ -312,6 +312,25 @@ class ShowBallSettingsButton < Button
 end
 
 ### GENERAL SETTINGS BUTTONS/INPUTS ###
+class SetScreenResolutionInput < TextInput
+	def init args
+		@axis = args[:axis]
+		case @axis
+		when :x
+			@label = "Width"
+			@text = SCREEN_RES[:w].to_s
+		when :y
+			@label = "Height"
+			@text = SCREEN_RES[:h].to_s
+		end
+		@size = {
+			w: 96,
+			h: 32
+		}
+		@chars_whitelist = ("0".."9").to_a
+	end
+end
+
 class ToggleMultipleBallsButton < Button
 	def init args
 		@label = "Multiple balls?"
