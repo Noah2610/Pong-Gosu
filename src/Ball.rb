@@ -8,20 +8,14 @@ class Ball
 		@y = @playing_area.h / 2
 		@x = args[:x]  if (!args[:x].nil?)
 		@y = args[:y]  if (!args[:y].nil?)
-		@size = 16
 		@color = Gosu::Color.argb 0xff_000000
-		@@speed_incr = $ball_speed_incr.dup
-		@@start_speed = $ball_start_speed.dup
-		@speed = @@start_speed.dup
-		@delay = args[:delay].nil? ? $ball_delay.dup : args[:delay]
-		@reset_time = (@delay == $ball_delay.dup) ? (Time.now + $ball_delay.dup) : (Time.now + @delay)
 		@@samples = {
 			pad_hit: Gosu::Sample.new("./samples/pad_hit.ogg")
 		}
-		@dir = $ball_start_dir.dup
-		if (@dir[:y] == :random)
-			@dir[:y] = (rand(2)) == 0 ? -1 : 1
-		end
+		@delay = args[:delay]
+
+		load_settings
+
 		if (!args[:side].nil?)
 			case args[:side]
 			when :left
@@ -33,6 +27,23 @@ class Ball
 		@last_pad_hit = -1
 		@destroy = false
 		@@timeout_unpause = 1
+	end
+
+	def load_settings
+		settings = $settings.ball
+		@size = settings[:size]
+		@@speed_incr = settings[:speed_incr]
+		@@start_speed = settings[:base_speed]
+		@speed = @@start_speed.dup
+		@delay = @delay.nil? ? settings[:delay] : @delay
+		@reset_time = Time.now + @delay
+		@dir = settings[:start_dir]
+		[:x,:y].each do |axis|
+			if (@dir[axis] == :random)
+				@dir[axis] = (rand(2)) == 0 ? -1 : 1
+			end
+		end
+		@speed[:y] = @@speed_incr[:y]  if ((@dir[:y] == 1 || @dir[:y] == -1) && @speed[:y] == 0)
 	end
 
 =begin

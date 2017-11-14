@@ -367,12 +367,12 @@ class Menu
 			ball_reset
 		else
 			@screen.playing_area.demo_game = false
-			@screen.playing_area.goal
+			@screen.playing_area.ball_reset
 		end
 	end
 
 	def ball_reset
-		@screen.playing_area.goal
+		@screen.playing_area.ball_reset
 	end
 
 	def update_buttons args

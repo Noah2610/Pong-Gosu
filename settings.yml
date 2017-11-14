@@ -1,0 +1,39 @@
+general:
+  resolution:
+    width:  840
+    height: 520
+  multiple_balls_delay: 0
+
+pad:
+  speed: 4
+  size:
+    width:  16
+    height: 64
+  speed_increment: 1
+
+ball:
+  size: 16
+  starting_speed:
+    x: 4
+    y: 0
+  starting_direction:
+    x: "random"
+    y: "random"
+  speed_increment:
+    x: 0.5
+    y: 1
+  spawn_delay: 3.0
+
+controls:
+  pad_one:
+    up:
+      - "Key:W"
+    down:
+      - "Key:S"
+  pad_two:
+    up:
+      - "Key:UP"
+    down:
+      - "Key:DOWN"
+  pause_button:
+    - "Key:P"

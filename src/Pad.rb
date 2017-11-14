@@ -8,7 +8,6 @@ class Pad
 		@playing_area = args[:playing_area]
 		@y = (@playing_area.h / 2)
 		@color = Gosu::Color.argb 0xff_000000
-		@size = PAD_SIZE.dup
 		@score = 0
 		case @id
 		when 0
@@ -19,16 +18,23 @@ class Pad
 			@x = 0
 		end
 
-		@controls = CONTROLS[@id].dup
-		@start_speed = PAD_SPEED.dup
-		@speed = @start_speed.dup
 		@segment_size = 1.0 / 4.0
-		@speed_increment = true
+
+		load_settings
 
 		init
 	end
 
 	def init
+	end
+
+	def load_settings
+		settings = $settings.pad
+		@controls = settings[:controls][@id]
+		@size = settings[:size]
+		@start_speed = settings[:base_speed]
+		@speed = @start_speed.dup
+		@speed_increment = settings[:speed_incr]
 	end
 
 	def set_start_speed speed

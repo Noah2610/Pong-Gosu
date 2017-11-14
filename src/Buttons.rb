@@ -318,10 +318,10 @@ class SetScreenResolutionInput < TextInput
 		case @axis
 		when :x
 			@label = "Width"
-			@text = SCREEN_RES[:w].to_s
+			@text = $settings.resolution[:w].to_s
 		when :y
 			@label = "Height"
-			@text = SCREEN_RES[:h].to_s
+			@text = $settings.resolution[:h].to_s
 		end
 		@size = {
 			w: 96,
@@ -338,7 +338,7 @@ class ToggleMultipleBallsButton < Button
 			w: 64,
 			h: 32
 		}
-		@text = ($multiple_balls ? "YES" : "NO")
+		@text = ($settings.ball[:multiple_balls_delay] > 0 ? "YES" : "NO")
 	end
 
 	def click!
@@ -348,7 +348,7 @@ class ToggleMultipleBallsButton < Button
 		when false
 			$multiple_balls = true
 		end
-		@text = ($multiple_balls ? "YES" : "NO")
+		@text = ($settings.ball[:multiple_balls_delay] > 0 ? "YES" : "NO")
 	end
 end
 
@@ -359,14 +359,14 @@ class MultipleBallsDelayInput < TextInput
 			w: 64,
 			h: 32
 		}
-		@text = $multiple_balls_delay.to_s
+		@text = $settings.ball[:multiple_balls_delay].to_s
 		@chars_whitelist = ("0".."9").to_a.concat([",","."])
 	end
 
 	def input_return
 		delay = @text.gsub(",",".").to_f
-		$multiple_balls_delay = delay
-		@text = $multiple_balls_delay.to_s
+		$settings.set :multiple_balls_delay, delay
+		@text = $settings.ball[:multiple_balls_delay].to_s
 	end
 end
 
@@ -380,7 +380,7 @@ class PadSpeedInput < TextInput
 		}
 		@pid = args[:pid] || :all
 		if (@pid == :all)
-			@text = PAD_SPEED.to_s
+			@text = $settings.pad[:base_speed].to_s
 		elsif (@pid.is_a? Integer)
 			@text = @menu.screen.playing_area.player(@pid).speed.to_s
 		end
@@ -412,7 +412,7 @@ class PadHeightInput < TextInput
 		}
 		@pid = args[:pid] || :all
 		if (@pid == :all)
-			@text = PAD_SIZE[:h].to_s
+			@text = $settings.pad[:size][:h].to_s
 		elsif (@pid.is_a? Integer)
 			@text = @menu.screen.playing_area.player(@pid).size[:h].to_s
 		end
@@ -485,13 +485,13 @@ class BallDelayInput < TextInput
 			w: 64,
 			h: 32
 		}
-		@text = $ball_delay.to_s
+		@text = $settings.ball[:delay].to_s
 		@chars_whitelist = ("0".."9").to_a.concat([".",","])
 	end
 
 	def input_return
-		$ball_delay = @text.to_f
-		@text = $ball_delay.to_s
+		$settings.set :ball_delay, @text.to_f
+		@text = $settings.ball[:delay].to_s
 		@menu.ball_reset
 	end
 end
@@ -503,13 +503,13 @@ class BallStartSpeedInput < TextInput
 			w: 64,
 			h: 32
 		}
-		@text = $ball_start_speed[:x].to_s
+		@text = $settings.ball[:base_speed][:x].to_s
 		@chars_whitelist = ("0".."9").to_a.concat([".",","])
 	end
 
 	def input_return
-		$ball_start_speed[:x] = @text.to_f.round.to_i
-		@text = $ball_start_speed[:x].to_s
+		$settings.set :ball_base_speed, @text.to_f.round.to_i, axis: :x
+		@text = $settings.ball[:base_speed][:x].to_s
 		@menu.ball_reset
 	end
 end
@@ -521,13 +521,13 @@ class BallSpeedIncrementInput < TextInput
 			w: 64,
 			h: 32
 		}
-		@text = $ball_speed_incr[:x].to_s
+		@text = $settings.ball[:speed_incr][:x].to_s
 		@chars_whitelist = ("0".."9").to_a.concat([".",","])
 	end
 
 	def input_return
-		$ball_speed_incr[:x] = @text.to_f
-		@text = $ball_speed_incr[:x].to_s
+		$settings.set :ball_speed_incr, @text.to_f, axis: :x
+		@text = $settings.ball[:speed_incr][:x].to_s
 		@menu.ball_reset
 	end
 end
@@ -550,17 +550,17 @@ class BallStartDirYButton < Button
 			w: 32,
 			h: 32
 		}
-		@@active = self  if (@dir == $ball_start_dir[:y])
+		@@active = self  if (@dir == $settings.ball[:start_dir][:y])
 	end
 
 	def click!
 		if (@@active != self)
 			@@active = self
-			$ball_start_dir[:y] = @dir
+			$settings.set :ball_start_dir, @dir, axis: :y
 			unless (@dir == 0)
-				$ball_start_speed[:y] = $ball_speed_incr[:y]
+				$settings.set :ball_base_speed, $settings.ball[:speed_incr][:y], axis: :y
 			else
-				$ball_start_speed[:y] = 0
+				$settings.set :ball_base_speed, 0, axis: :y
 			end
 			@menu.ball_reset
 		end

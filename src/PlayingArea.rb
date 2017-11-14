@@ -12,7 +12,7 @@ class PlayingArea
 			Cpu.new(id: 1, playing_area: self)
 		]
 		@balls = []
-		@new_ball_delay_sec = $multiple_balls_delay + $ball_delay.dup
+		@new_ball_delay_sec = $settings.ball[:multiple_balls_delay] + $settings.ball[:delay]
 		@new_ball_at = nil
 		@demo_game = false
 	end
@@ -86,7 +86,6 @@ class PlayingArea
 	end
 
 	def handle_new_ball
-		return  if (!$multiple_balls || !$game_running)
 		if (!@new_ball_at.nil? && @new_ball_at < Time.now)
 			new_ball  unless (@new_ball_at.nil?)
 			@new_ball_at = Time.now + @new_ball_delay_sec
@@ -95,16 +94,16 @@ class PlayingArea
 
 	def reset side = :right
 		@balls.clear
-		@balls << Ball.new(playing_area: self, side: side, delay: $ball_delay.dup)
+		@balls << Ball.new(playing_area: self, side: side, delay: $settings.ball[:delay])
 		@new_ball_at = Time.now + @new_ball_delay_sec
 	end
 
+	def ball_reset
+		@balls.clear
+		@balls << Ball.new(playing_area: self, side: ((rand(2) == 0) ? :left : :right), delay: $settings.ball[:delay])  if (@demo_game)
+	end
+
 	def goal side = ((rand(2) == 0) ? :left : :right)
-		unless ($game_running)
-			@balls.clear
-			@balls << Ball.new(playing_area: self, side: side, delay: $ball_delay.dup)  if (@demo_game)
-			return
-		end
 		case side
 		when :left
 			reset :right
@@ -123,7 +122,7 @@ class PlayingArea
 
 	def button_down id
 		# Check for pause button
-		PAUSE_BUTTON.each do |pbtn|
+		$settings.pause_button.each do |pbtn|
 			if (id == pbtn)
 				$game_paused = !$game_paused
 				if (!$game_paused)
@@ -138,7 +137,7 @@ class PlayingArea
 
 	def update
 		@pads.each &:update
-		handle_new_ball
+		handle_new_ball  if ($settings.ball[:multiple_balls_delay] > 0 && $game_running)
 		@balls.each &:update
 	end
 
