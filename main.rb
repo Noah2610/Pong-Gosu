@@ -1,7 +1,7 @@
 #!/bin/env ruby
 
 require 'gosu'
-require 'byebug'
+#require 'byebug'
 require './src/Buttons'
 require './src/Menu'
 require './src/Screen'
