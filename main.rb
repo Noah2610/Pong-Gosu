@@ -149,11 +149,6 @@ class Settings
 	end
 end
 
-settings_file = "./settings.yml"
-$settings = Settings.new settings_file
-ap $settings.settings
-
-
 def btn_id_to_char id
 	ret = Gosu.button_id_to_char(id).upcase
 	if (ret == "")
@@ -210,6 +205,7 @@ class Game < Gosu::Window
 	end
 end
 
+$settings = Settings.new "./settings.yml"
 $game_running = false
 $game_paused = false
 $game = Game.new
