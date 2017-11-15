@@ -6,6 +6,7 @@ class Player < Pad
 
 	def update_control args
 		@controls[args[:dir]] = [args[:key]]
+		$settings.set :controls, [args[:key]], id: @id, dir: args[:dir]
 		return args[:key]
 	end
 end

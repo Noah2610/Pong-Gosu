@@ -237,7 +237,14 @@ class TextInput < Button
 				key = Gosu.button_id_to_char(id)
 				if ((@chars_whitelist.empty? || @chars_whitelist.include?(key)) && !@chars_blacklist.include?(key))
 					if (Gosu.button_down?(Gosu::KB_LEFT_SHIFT) || Gosu.button_down?(Gosu::KB_RIGHT_SHIFT))
-						@text += key.upcase
+						case key
+						when "-"
+							@text += "_"
+						when "7"
+							@text += "/"
+						else
+							@text += key.upcase
+						end
 					else
 						@text += key
 					end
@@ -308,6 +315,26 @@ class ShowBallSettingsButton < Button
 	end
 	def click!
 		@menu.show :settings_ball
+	end
+end
+
+class ExportSettingsInput < TextInput
+	def init args
+		@label_default = "Export settings to file:"
+		@label = @label_default
+		@text = "./settings.yml"
+		@chars_whitelist = ("a".."z").to_a.concat(("0".."9").to_a, [".","/","-","_"])
+	end
+
+	def show
+		@show = true
+		@label = @label_default
+	end
+
+	def input_return
+		if ($settings.save @text)
+			@label = "Settings saved to \'#{@text}\'"
+		end
 	end
 end
 

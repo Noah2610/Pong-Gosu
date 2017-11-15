@@ -7,7 +7,7 @@ class Menu
 		@screen = args[:screen]
 		@show = true
 		@has_clicked = false
-		@buttons = {
+		@inputs = {
 			main: [
 				StartButton.new(
 					menu:  self,
@@ -59,53 +59,60 @@ class Menu
 					pid:   0,
 					state: :player,
 					x:     (@screen.playing_area.w / 4),
-					y:     ((@screen.playing_area.h / 4) * 3)
+					y:     ((@screen.playing_area.h / 4) * 3.25)
 				),
 				TogglePadTypeButton.new(
 					menu:  self,
 					pid:   1,
 					state: :cpu,
 					x:     ((@screen.playing_area.w / 4) * 3),
-					y:     ((@screen.playing_area.h / 4) * 3)
+					y:     ((@screen.playing_area.h / 4) * 3.25)
 				),
 				ShowSettingsButton.new(
 					menu:  self,
 					x:     (@screen.playing_area.w / 2),
-					y:     ((@screen.playing_area.h / 4) * 3)
+					y:     ((@screen.playing_area.h / 4) * 3.25)
 				)
 			],
-
 			settings: [
 				ShowMainButton.new(
 					menu:  self,
 					x:     (@screen.playing_area.w / 2),
-					y:     ((@screen.playing_area.h / 4) * 3)
+					y:     ((@screen.playing_area.h / 4) * 3.25)
 				),
 				ShowGeneralSettingsButton.new(
 					menu:  self,
 					x:     (@screen.playing_area.w / 2),
-					y:     (@screen.playing_area.h / 4 * 1.5),
+					y:     (@screen.playing_area.h / 4),
 					size:  { w: 192, h: 42 }
 				),
 				ShowPadSettingsButton.new(
 					menu:  self,
 					x:     (@screen.playing_area.w / 2),
-					y:     (@screen.playing_area.h / 2),
+					y:     (@screen.playing_area.h / 4 * 1.5),
 					size:  { w: 192, h: 42 }
 				),
 				ShowBallSettingsButton.new(
 					menu:  self,
 					x:     (@screen.playing_area.w / 2),
-					y:     (@screen.playing_area.h / 4 * 2.5),
+					y:     (@screen.playing_area.h / 2),
 					size:  { w: 192, h: 42 }
+				),
+				# Export settings to file input
+				ExportSettingsInput.new(
+					menu:  self,
+					x:     (@screen.playing_area.w / 2),
+					y:     (@screen.playing_area.h / 4 * 2.7),
+					size:  { w: 192, h: 42 },
 				)
 			],
 
+			# GENERAL SETTINGS
 			settings_general: [
 				ShowSettingsButton.new(
 					menu:  self,
 					x:     (@screen.playing_area.w / 2),
-					y:     ((@screen.playing_area.h / 4) * 3),
+					y:     ((@screen.playing_area.h / 4) * 3.25),
 					text:  "Back"
 				),
 				# Toggle multiple balls button
@@ -113,14 +120,34 @@ class Menu
 					menu:  self,
 					x:     (@screen.playing_area.w / 3),
 					y:     (@screen.playing_area.h / 2 * 1.1)
+				),
+				# Screen resolution
+				SetScreenResolutionInput.new(
+					menu:  self,
+					x:     (@screen.playing_area.w / 2 * 0.85),
+					y:     (@screen.playing_area.h / 4 * 1.5),
+					axis:  :x
+				),
+				SetScreenResolutionInput.new(
+					menu:  self,
+					x:     (@screen.playing_area.w / 2 * 1.15),
+					y:     (@screen.playing_area.h / 4 * 1.5),
+					axis:  :y
+				),
+				# Mulitple balls delay
+				MultipleBallsDelayInput.new(
+					menu:  self,
+					x:     (@screen.playing_area.w / 3 * 2),
+					y:     (@screen.playing_area.h / 2 * 1.1)
 				)
 			],
 
+			# PAD SETTINGS
 			settings_pad: [
 				ShowSettingsButton.new(
 					menu:  self,
 					x:     (@screen.playing_area.w / 2),
-					y:     ((@screen.playing_area.h / 4) * 3),
+					y:     ((@screen.playing_area.h / 4) * 3.25),
 					text:  "Back"
 				),
 				# TOGGLE PAD SPEED INCREMENTATION
@@ -145,46 +172,6 @@ class Menu
 					y:     ((@screen.playing_area.h / 4) * 2.5),
 					pid:   1
 				),
-			],
-
-			settings_ball: [
-				ShowSettingsButton.new(
-					menu:  self,
-					x:     (@screen.playing_area.w / 2),
-					y:     ((@screen.playing_area.h / 4) * 3),
-					text:  "Back"
-				)
-			]
-		}
-
-		@inputs = {
-			main: [],
-			settings: [],
-			# GENERAL SETTINGS
-			settings_general: [
-				# Screen resolution
-				SetScreenResolutionInput.new(
-					menu:  self,
-					x:     (@screen.playing_area.w / 2 * 0.85),
-					y:     (@screen.playing_area.h / 4 * 1.5),
-					axis:  :x
-				),
-				SetScreenResolutionInput.new(
-					menu:  self,
-					x:     (@screen.playing_area.w / 2 * 1.15),
-					y:     (@screen.playing_area.h / 4 * 1.5),
-					axis:  :y
-				),
-				# Mulitple balls delay
-				MultipleBallsDelayInput.new(
-					menu:  self,
-					x:     (@screen.playing_area.w / 3 * 2),
-					y:     (@screen.playing_area.h / 2 * 1.1)
-				)
-			],
-
-			# PAD SETTINGS
-			settings_pad: [
 				# SPEED
 				# all Pads
 				PadSpeedInput.new(
@@ -229,12 +216,17 @@ class Menu
 					x:     (@screen.playing_area.w / 4 * 3),
 					y:     (@screen.playing_area.h / 2),
 					pid:   1
-				),
-
+				)
 			],
 
 			# BALL SETTINGS
 			settings_ball: [
+				ShowSettingsButton.new(
+					menu:  self,
+					x:     (@screen.playing_area.w / 2),
+					y:     ((@screen.playing_area.h / 4) * 3.25),
+					text:  "Back"
+				),
 				# Ball Spawn Delay
 				BallDelayInput.new(
 					menu:  self,
@@ -277,7 +269,7 @@ class Menu
 					menu:  self,
 					x:     (@screen.playing_area.w / 3 * 2),
 					y:     (@screen.playing_area.h / 4 * 1.5)
-				),
+				)
 			]
 		}
 
@@ -353,13 +345,11 @@ class Menu
 
 	def show page
 		@page = page
-		[@buttons, @inputs].each do |group|
-			group.each do |k,v|
-				if (k != page)
-					group[k].each &:hide
-				elsif (k == page)
-					group[k].each &:show
-				end
+		@inputs.each do |k,v|
+			if (k != page)
+				v.each &:hide
+			elsif (k == page)
+				v.each &:show
 			end
 		end
 		if (page == :settings_ball)
@@ -376,7 +366,7 @@ class Menu
 	end
 
 	def update_buttons args
-		@buttons[:main].each do |btn|
+		@inputs[:main].each do |btn|
 			if (btn.class == ControlSelectButton && btn.pid == args[:pid])
 				case @screen.playing_area.player(args[:pid]).class.to_s.to_sym
 				when :Player
@@ -389,11 +379,9 @@ class Menu
 	end
 
 	def button_down id
-		[@buttons, @inputs].each do |group|
-			group.each do |k,v|
-				group[k].each do |inst|
-					return  if (inst.button_down(id))
-				end
+		@inputs.each do |k,v|
+			v.each do |inst|
+				return  if (inst.button_down(id))
 			end
 		end
 		if (!$game_running && (id == Gosu::KB_SPACE || id == Gosu::KB_RETURN))
@@ -402,18 +390,14 @@ class Menu
 	end
 
 	def click
-		[@buttons, @inputs].each do |group|
-			group.each do |k,v|
-				group[k].each &:click
-			end
+		@inputs.each do |k,v|
+			v.each &:click
 		end
 	end
 
 	def update
-		[@buttons, @inputs].each do |group|
-			group.each do |k,v|
-				group[k].each &:update
-			end
+		@inputs.each do |k,v|
+			v.each &:update
 		end
 
 		# Move CPUs as demonstration for :settings_pad page
@@ -431,11 +415,9 @@ class Menu
 		@texts[@page].each do |group|
 			group[:font].draw_rel group[:text], group[:x],group[:y], 1, 0.5,0.5, 1,1, group[:color]
 		end
-		# Draw buttons
-		[@buttons, @inputs].each do |group|
-			group.each do |k,v|
-				group[k].each &:draw
-			end
+		# Draw inputs
+		@inputs.each do |k,v|
+			v.each &:draw
 		end
 	end
 end

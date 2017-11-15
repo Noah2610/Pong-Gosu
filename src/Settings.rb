@@ -1,10 +1,20 @@
 
 # source of deep_merge:
-# https://stackoverflow.com/questions/9381553/ruby-merge-nested-hash/30225093#30225093
+# https://stackoverflow.com/a/30225093
+=begin
 class ::Hash
 	def deep_merge(second)
 		merger = proc { |key, v1, v2| Hash === v1 && Hash === v2 ? v1.merge(v2, &merger) : Array === v1 && Array === v2 ? v1 | v2 : [:undefined, nil, :nil].include?(v2) ? v1 : v2  }
 		self.merge(second.to_h, &merger)
+	end
+end
+=end
+# source of deep_merge:
+# https://stackoverflow.com/a/9381776
+class ::Hash
+	def deep_merge(second)
+		merger = proc { |key, v1, v2| Hash === v1 && Hash === v2 ? v1.merge(v2, &merger) : v2  }
+		self.merge(second, &merger)
 	end
 end
 
@@ -20,8 +30,9 @@ class Settings
 
 	def save filename = "settings_out.yml"
 		file = File.new filename, "w"
-		file.write "#{parse_to_strings(@settings).to_yaml}..."
+		ret = !!file.write("#{parse_to_strings(@settings).to_yaml}...")
 		file.close
+		return ret
 	end
 
 	def set key, val, args = nil
@@ -33,10 +44,26 @@ class Settings
 			when :h, :height, :y
 				@settings[:general][:resolution][:height] = val
 			when nil
-			else
-				puts "ELSE"
+				@settings[:general][:resolution] = val
 			end
 			return @settings[:general][:resolution]
+
+		when :controls
+			unless (args[:dir].nil?)
+				case args[:id]
+				when 0
+					@settings[:controls][:pad_one][args[:dir]] = val
+					return @settings[:controls][:pad_one]
+				when 1
+					@settings[:controls][:pad_two][args[:dir]] = val
+					return @settings[:controls][:pad_two]
+				when nil
+					@settings[:controls][:pad_one] = val
+					return @settings[:controls]
+				end
+			else
+				return false
+			end
 
 		when :ball_delay
 			@settings[:ball][:spawn_delay] = val
