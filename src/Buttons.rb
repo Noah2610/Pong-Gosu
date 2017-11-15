@@ -329,6 +329,10 @@ class SetScreenResolutionInput < TextInput
 		}
 		@chars_whitelist = ("0".."9").to_a
 	end
+
+	def input_return
+		$settings.set :resolution, @text.to_i, axis: @axis
+	end
 end
 
 class ToggleMultipleBallsButton < Button

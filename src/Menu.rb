@@ -306,7 +306,7 @@ class Menu
 			settings: [],
 			settings_general: [
 				{
-					text:  "Screen Resolution (Work In Progress)",
+					text:  "Screen Resolution (requires saving settings, then restart)",
 					font:  Gosu::Font.new(32),
 					color: Gosu::Color.argb(0xff_6644aa),
 					x:     (@screen.playing_area.w / 2),
