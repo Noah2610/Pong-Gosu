@@ -37,6 +37,8 @@ end
 
 
 class Game < Gosu::Window
+	attr_reader :screen
+
 	def initialize
 		@screen = Screen.new w: $settings.resolution[:w], h: $settings.resolution[:h]
 		super @screen.w, @screen.h
@@ -51,16 +53,16 @@ class Game < Gosu::Window
 	def button_up id
 		case id
 		when Gosu::MS_LEFT, Gosu::MS_RIGHT, Gosu::MS_MIDDLE
-			@screen.menu.has_clicked = false
+			@screen.has_clicked = false
 		end
 	end
 
 	def needs_cursor?
-		!$game_running
+		$needs_cursor
 	end
 
 	def update
-		@screen.update  unless ($game_paused)
+		@screen.update
 	end
 
 	def draw
@@ -69,6 +71,7 @@ class Game < Gosu::Window
 end
 
 $settings = Settings.new "./settings.yml"
+$needs_cursor = true
 $game_running = false
 $game_paused = false
 $game = Game.new

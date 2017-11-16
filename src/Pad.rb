@@ -6,16 +6,16 @@ class Pad
 	def initialize args
 		@id = args[:id]
 		@playing_area = args[:playing_area]
-		@y = (@playing_area.h / 2)
+		@y = (@playing_area.y + @playing_area.h / 2)
 		@color = Gosu::Color.argb 0xff_000000
 		@score = 0
 		case @id
 		when 0
-			@x = 32
+			@x = @playing_area.x + 32
 		when 1
-			@x = @playing_area.w - 32
+			@x = @playing_area.x + @playing_area.w - 32
 		else
-			@x = 0
+			@x = @playing_area.x
 		end
 
 		@segment_size = 1.0 / 4.0
@@ -75,9 +75,9 @@ class Pad
 		dir = 0
 		case id
 		when :up
-			dir = -1  unless (@y - (@size[:h] / 2) <= 0)
+			dir = -1  unless (@y - (@size[:h] / 2) <= @playing_area.y)
 		when :down
-			dir = 1   unless (@y + (@size[:h] / 2) >= @playing_area.h)
+			dir = 1   unless (@y + (@size[:h] / 2) >= @playing_area.y + @playing_area.h)
 		else
 			return
 		end

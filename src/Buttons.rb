@@ -8,8 +8,8 @@ class Button
 
 	def initialize_defaults args
 		@menu = args[:menu]
-		@x = args[:x] || (@menu.screen.playing_area.w / 2)
-		@y = args[:y] || (@menu.screen.playing_area.h / 2)
+		@x = args[:x] || ($game.screen.playing_area.w / 2)
+		@y = args[:y] || ($game.screen.playing_area.h / 2)
 		@size = args[:size] || { w: 128, h: 42 }
 		@default_color = {
 			bg:     Gosu::Color.argb(0xff_aaaaaa),
@@ -27,6 +27,7 @@ class Button
 			border: Gosu::Color.argb(0xff_000000)
 		}
 		@label_color = Gosu::Color.argb(0xff_4444aa)
+		@label_distance = args[:label_distance] || 0
 		@color = @default_color
 		@border_width = 2
 		@font = Gosu::Font.new(args[:font_size] || 24)
@@ -62,9 +63,9 @@ class Button
 	end
 
 	def click
-		return  if (!@show || @menu.has_clicked)
+		return  if (!@show || $game.screen.has_clicked)
 		if (@last_in_collision)
-			@menu.has_clicked = true
+			$game.screen.has_clicked = true
 			click!
 		end
 	end
@@ -93,7 +94,7 @@ class Button
 		@font.draw_rel @text, @x,@y, 1, 0.5,0.5, 1,1, @color[:fg]
 		# Draw label (for TextInput)
 		if (defined? @label)
-			@label_font.draw_rel @label, @x,(@y - (@size[:h] * 0.75)), 1, 0.5,0.5, 1,1, @label_color
+			@label_font.draw_rel @label, @x,(@y - (@size[:h] * 0.75 + @label_distance)), 1, 0.5,0.5, 1,1, @label_color
 		end
 
 		custom_update  if (defined? custom_update)
@@ -609,6 +610,41 @@ class BallStartDirYButton < Button
 			end
 			@last_in_collision = in_collision
 		end
+	end
+end
+
+
+
+### GAME RUNNING AND PAUSED BUTTONS/INPUTS ###
+class ContinueGameButton < Button
+	def init args
+		@playing_area = args[:playing_area]
+		@label = "PAUSED"
+		@label_color = Gosu::Color.argb(0xff_ff4444)
+		@text = "Continue"
+		@size = {
+			w: 208,
+			h: 32
+		}
+	end
+
+	def click!
+		@playing_area.toggle_pause_game :unpause
+	end
+end
+
+class BackToMenuButton < Button
+	def init args
+		@playing_area = args[:playing_area]
+		@text = "Return to Main Menu"
+		@size = {
+			w: 208,
+			h: 32
+		}
+	end
+
+	def click!
+		@playing_area.to_menu
 	end
 end
 
