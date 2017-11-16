@@ -1,6 +1,6 @@
 
 class PlayingArea
-	attr_reader :w,:h, :x,:y, :pads, :balls, :screen
+	attr_reader :w,:h, :x,:y, :pads, :balls, :screen, :pad_offset, :effects
 	attr_accessor :demo_game
 
 	def initialize args
@@ -9,6 +9,7 @@ class PlayingArea
 		@h = args[:h]
 		@x = args[:x] || 0
 		@y = args[:y] || 0
+		@pad_offset = 32
 		@pads = [
 			Player.new(id: 0, playing_area: self),
 			Cpu.new(id: 1, playing_area: self)
@@ -36,6 +37,11 @@ class PlayingArea
 				size:  { w: 32, h: 32 }
 			)
 		]
+
+		puts $settings.effect.to_s
+		@new_effect_at = Time.now + $settings.effect[:spawn_rate]
+
+		@effects = []
 	end
 
 	def set_pad args
@@ -172,6 +178,20 @@ class PlayingArea
 		$game_running = false
 	end
 
+	def handle_effects
+		if (Time.now > @new_effect_at)
+			@effects << Effects.new(
+				playing_area: self,
+				effect:       :spd_up
+			)
+			@new_effect_at = Time.now + $settings.effect[:spawn_rate]
+		end
+	end
+
+	def destroy_effect effect
+		@effects.delete effect
+	end
+
 	def button_down id
 		# Check for pause button
 		$settings.pause_button.each do |pbtn|
@@ -188,8 +208,11 @@ class PlayingArea
 
 	def update
 		unless ($game_paused)
+			if ($game_running)
+				handle_new_ball  if ($settings.ball[:multiple_balls_delay] > 0)
+				handle_effects   unless ($settings.effect[:spawn_rate] == 0)
+			end
 			@pads.each &:update
-			handle_new_ball  if ($settings.ball[:multiple_balls_delay] > 0 && $game_running)
 			@balls.each &:update
 		end
 		# Update inputs (when game is paused)
@@ -209,6 +232,9 @@ class PlayingArea
 
 		# Draw inputs (when game is paused)
 		@inputs_paused.each &:draw
+
+		# Draw sprites (Effects)
+		@effects.each &:draw
 	end
 end
 

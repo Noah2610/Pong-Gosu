@@ -91,10 +91,10 @@ class Button
 		# Draw bg
 		Gosu.draw_rect (x + @border_width),(y + @border_width), (@size[:w] - @border_width * 2),(@size[:h] - @border_width * 2), @color[:bg]
 		# Draw text
-		@font.draw_rel @text, @x,@y, 1, 0.5,0.5, 1,1, @color[:fg]
+		@font.draw_rel @text, @x,@y, 10, 0.5,0.5, 1,1, @color[:fg]
 		# Draw label (for TextInput)
 		if (defined? @label)
-			@label_font.draw_rel @label, @x,(@y - (@size[:h] * 0.75 + @label_distance)), 1, 0.5,0.5, 1,1, @label_color
+			@label_font.draw_rel @label, @x,(@y - (@size[:h] * 0.75 + @label_distance)), 10, 0.5,0.5, 1,1, @label_color
 		end
 
 		custom_update  if (defined? custom_update)

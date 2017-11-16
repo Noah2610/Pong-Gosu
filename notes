@@ -1,5 +1,22 @@
 
 TODO:
-	- Menu (Class):
-		- Settings
+	Effects:
+		Power-Ups (buffs)   (GREEN):
+			- Increase Pad speed
+			- Increase Pad height
+			- Decrease enemy Pad height
+			- Decrease enemy Pad speed
+		Power-Downs (nerfs) (RED):
+			- Decrease Pad speed
+			- Decrease Pad height
+		Neutrals            (BLUE):
+			- Decrease/Increase ball speed
+			- Decrease/Increase ball size
+
+
+BUGS:
+	pad - speed_increment:
+		is NOT saved
+	Effect collision checking not working properlly
+	spd_up Effect only works when pad speed_incrementation is off
 

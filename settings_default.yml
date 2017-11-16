@@ -4,6 +4,7 @@ general:
     width: 840
     height: 520
   multiple_balls_delay: 0
+  effect_spawn_rate: 5
 
 pad:
   speed: 4

@@ -9,16 +9,21 @@ class Pad
 		@y = (@playing_area.y + @playing_area.h / 2)
 		@color = Gosu::Color.argb 0xff_000000
 		@score = 0
+		@offset = @playing_area.pad_offset
 		case @id
 		when 0
-			@x = @playing_area.x + 32
+			@x = @playing_area.x + @offset
 		when 1
-			@x = @playing_area.x + @playing_area.w - 32
+			@x = @playing_area.x + @playing_area.w - @offset
 		else
 			@x = @playing_area.x
 		end
 
 		@segment_size = 1.0 / 4.0
+
+		@effect_wearoffs = {
+			spd_up: nil
+		}
 
 		load_settings
 
@@ -35,6 +40,14 @@ class Pad
 		@start_speed = settings[:base_speed]
 		@speed = @start_speed.dup
 		@speed_increment = settings[:speed_incr]
+	end
+
+	def add_effect type
+		case type
+		when :spd_up
+			@speed *= 2
+			@effect_wearoffs[:spd_up] = Time.now + 5
+		end
 	end
 
 	def set_start_speed speed
@@ -55,6 +68,18 @@ class Pad
 		@speed_increment = !!state
 	end
 
+	def handle_effect_wearoffs
+		@effect_wearoffs.each do |type,wearoff|
+			if (!wearoff.nil? && Time.now > wearoff)
+				@effect_wearoffs[type] = nil
+				case type
+				when :spd_up
+					@speed = @start_speed
+				end
+			end
+		end
+	end
+
 	def update
 		# Player controls
 		@controls.each do |k,v|
@@ -62,6 +87,8 @@ class Pad
 				move k  if (Gosu.button_down? btn)
 			end
 		end
+		# Handle effect wearoffs
+		handle_effect_wearoffs
 	end
 
 	def move id

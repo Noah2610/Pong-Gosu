@@ -14,6 +14,7 @@ require './src/Panel'
 require './src/Pad'
 require './src/Player'
 require './src/Cpu'
+require './src/Effects'
 
 
 def btn_id_to_char id

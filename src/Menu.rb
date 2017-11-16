@@ -406,14 +406,14 @@ class Menu
 
 	def draw
 		# Draw title
-		@title[:font].draw_rel @title[:text][@page], @title[:x],@title[:y], 1, 0.5,0.5, 1,1, @title[:color]
+		@title[:font].draw_rel @title[:text][@page], @title[:x],@title[:y], 10, 0.5,0.5, 1,1, @title[:color]
 		# Draw footer
 		@footer[:text].each_with_index do |text,count|
-			@footer[:font].draw_rel text, @footer[:x],(@footer[:y] + 16 * count), 1, 0.5,0.5, 1,1, @footer[:color]
+			@footer[:font].draw_rel text, @footer[:x],(@footer[:y] + 16 * count), 10, 0.5,0.5, 1,1, @footer[:color]
 		end
 		# Draw extra @texts
 		@texts[@page].each do |group|
-			group[:font].draw_rel group[:text], group[:x],group[:y], 1, 0.5,0.5, 1,1, group[:color]
+			group[:font].draw_rel group[:text], group[:x],group[:y], 10, 0.5,0.5, 1,1, group[:color]
 		end
 		# Draw inputs
 		@inputs.each do |k,v|

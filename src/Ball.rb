@@ -129,6 +129,20 @@ class Ball
 			}
 		end  if (target == :all || target == :border)
 
+		# Collision checking - Effects
+		@playing_area.effects.each do |effect|
+			if    (((@x + @size / 2) > (effect.x - effect.size / 2) && (@x + @size / 2) < (effect.x + effect.size / 2) &&
+			        (@y + @size / 2) > (effect.y - effect.size / 2) && (@y + @size / 2) < (effect.y + effect.size / 2)) ||
+			       ((@x - @size / 2) > (effect.x - effect.size / 2) && (@x - @size / 2) < (effect.x + effect.size / 2) &&
+			        (@y - @size / 2) > (effect.y - effect.size / 2) && (@y - @size / 2) < (effect.y + effect.size / 2))
+						)
+				return {
+					target: :effect,
+					effect: effect
+				}
+			end
+		end  if (target == :all || target == :effect)
+
 		return false
 	end
 
@@ -196,6 +210,9 @@ class Ball
 				when :top
 					@dir[:y] = 1
 				end
+
+			when :effect
+				coll[:effect].hit @playing_area.player(@last_pad_hit)
 
 			end
 		end

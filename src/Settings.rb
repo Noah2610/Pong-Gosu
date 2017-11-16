@@ -156,6 +156,12 @@ class Settings
 		return @settings[:controls][:pause_button].dup
 	end
 
+	def effect
+		return {
+			spawn_rate: @settings[:general][:effect_spawn_rate]
+		}
+	end
+
 	def load_settings file, default = false
 		data = YAML.load_file(file)
 		case default
