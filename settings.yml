@@ -19,7 +19,7 @@ ball:
     y: 0
   starting_direction:
     x: random
-    y: random
+    y: 0
   speed_increment:
     x: 0.5
     y: 1

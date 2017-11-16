@@ -19,7 +19,7 @@ ball:
     y: 0
   starting_direction:
     x: random
-    y: random
+    y: 0
   speed_increment:
     x: 0.5
     y: 1
@@ -28,9 +28,9 @@ ball:
 controls:
   pad_one:
     up:
-      - Key:K
+      - Key:W
     down:
-      - Key:J
+      - Key:S
   pad_two:
     up:
       - Key:UP

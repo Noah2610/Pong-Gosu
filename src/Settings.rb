@@ -217,13 +217,13 @@ class Settings
 					ret = "Key:#{char.upcase}"
 				elsif (char == "")
 					case data
-					when 82  # UP
+					when Gosu::KB_UP
 						ret = "Key:UP"
-					when 81  # DOWN
+					when Gosu::KB_DOWN
 						ret = "Key:DOWN"
-					when 80  # LEFT
+					when Gosu::KB_LEFT
 						ret = "Key:LEFT"
-					when 79  # RIGHT
+					when Gosu::KB_RIGHT
 						ret = "Key:RIGHT"
 					else
 						ret = data

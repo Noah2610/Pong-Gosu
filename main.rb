@@ -2,8 +2,8 @@
 
 require 'gosu'
 require 'yaml'
-require 'awesome_print'
-require 'byebug'
+#require 'awesome_print'
+#require 'byebug'
 require './src/Settings'
 require './src/Buttons'
 require './src/Menu'
