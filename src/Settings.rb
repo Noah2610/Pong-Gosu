@@ -23,9 +23,13 @@ class Settings
 
 	def initialize filename
 		filename_default = "./settings_default.yml"
-		load_settings filename
 		load_settings filename_default, true
-		@settings = @settings_default.deep_merge @settings
+		if (File.exists? filename)
+			load_settings filename
+			@settings = @settings_default.deep_merge @settings
+		else
+			@settings = @settings_default
+		end
 	end
 
 	def save filename = "settings_out.yml"
