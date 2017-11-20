@@ -35,4 +35,5 @@ controls:
     - Key:DOWN
   pause_button:
   - Key:P
+  - Key:RETURN
 ...

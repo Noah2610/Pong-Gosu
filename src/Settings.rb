@@ -229,6 +229,8 @@ class Settings
 						ret = "Key:LEFT"
 					when Gosu::KB_RIGHT
 						ret = "Key:RIGHT"
+					when Gosu::KB_RETURN
+						ret = "Key:RETURN"
 					else
 						ret = data
 					end

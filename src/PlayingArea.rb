@@ -167,6 +167,7 @@ class PlayingArea
 
 	def to_menu
 		toggle_pause_game :unpause
+		$needs_cursor = true
 		@balls.clear
 		@pads.each { |p| p.score = 0 }
 		$game_running = false
